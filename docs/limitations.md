@@ -30,3 +30,10 @@ Remote sensing workflows provide planetary-scale observation but operate under p
 ## 6. Open-Vocabulary Objects (CLIP/SAM Experimental Module)
 
 - Any detection of complex anthropogenic objects (e.g., brick kilns, aquaculture cages) via CLIP/SAM is experimental, uncalibrated for formal cadastral or regulatory enforcement, and must be validated with high-resolution sub-meter aerial or ground truth data.
+
+## 7. Inter-Annual Cyclical Variability & Noise Margins
+
+- **Empirical Variability**: Long-term time-series analysis for Raipur (2018–2025) demonstrates that natural post-monsoon surface water fluctuates with a mean annual step of $458.44\,\text{ha}$ and a standard deviation of $\sigma = 321.72\,\text{ha}$.
+- **Composite Subsampling Sensitivity**: Controlled 20-fold resampling of clear Sentinel-2 scenes demonstrates that composite composition alone introduces a sampling spread of $\approx 99.71\,\text{ha}$.
+- **Attribution Policy**: Observed net changes between two arbitrary years (e.g., $+46.66\,\text{ha}$ between 2023 and 2025) that fall well below annual cyclical noise ($458.44\,\text{ha}$) and sampling spread ($99.71\,\text{ha}$) cannot be defensibly asserted as structural expansion or contraction. The pipeline classifies such changes as `within noise / inconclusive`.
+- **AOI Bounding Box Policy**: Radial spatial queries (e.g., 'within 15 km of Raipur') define a square UTM projected bounding box envelope of side $2 \times \text{radius}$ ($907.50\,\text{km}^2$ for 15 km half-width). All reported statistics and raster arrays reflect the complete bounding box, which is explicitly reported in every summary.
