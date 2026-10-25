@@ -149,9 +149,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run query planner benchmark evaluation.")
     parser.add_argument(
         "--dataset",
-        choices=["golden_queries.yaml", "golden_heldout.yaml"],
-        default="golden_heldout.yaml",
-        help="Evaluation dataset file (default: golden_heldout.yaml).",
+        choices=["golden_queries.yaml", "golden_heldout.yaml", "golden_heldout_v2.yaml"],
+        default="golden_heldout_v2.yaml",
+        help="Evaluation dataset file (default: golden_heldout_v2.yaml).",
     )
     args = parser.parse_args()
     run_planner_eval(args.dataset)

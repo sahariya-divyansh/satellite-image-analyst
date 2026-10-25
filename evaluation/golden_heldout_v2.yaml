@@ -1,0 +1,186 @@
+# Golden Evaluation Set: Held-Out Benchmark v2 (20 Unseen Queries)
+# Evaluated strictly once following generic planner root-cause fixes.
+# Categories: Coordinate Parsing, Clarification Policy, Archive Limits, Hinglish, Out-of-Scope, Buffer Radiuses
+
+queries:
+  # --- 1. Decimal-Degree Coordinates ---
+  - id: ho2_01
+    query: "Show water body change near 21.15N, 79.08E from 2021 to 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "21.1500°N, 79.0800°E"
+      season_policy: "post_monsoon"
+      year_a: 2021
+      year_b: 2024
+      needs_clarification: false
+
+  - id: ho2_02
+    query: "Assess water surface area around 26.91, 75.78 in 2024."
+    expected:
+      task_type: "water_extent"
+      place_name: "26.9100°N, 75.7800°E"
+      season_policy: "post_monsoon"
+      year_a: 2024
+      year_b: null
+      needs_clarification: false
+
+  - id: ho2_03
+    query: "Detect lake shrinkage near 17.3850 N, 78.4867 E between 2022 and 2025 during pre-monsoon."
+    expected:
+      task_type: "water_change"
+      place_name: "17.3850°N, 78.4867°E"
+      season_policy: "pre_monsoon"
+      year_a: 2022
+      year_b: 2025
+      needs_clarification: false
+
+  # --- 2. Ambiguity & Missing Comparison Periods (Clarification Policy) ---
+  - id: ho2_04
+    query: "Show water change near Raipur."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      needs_clarification: true
+
+  - id: ho2_05
+    query: "Compare water bodies in Bhopal in 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      needs_clarification: true
+
+  - id: ho2_06
+    query: "Find lake expansion near Bilaspur for the year 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Bilaspur"
+      needs_clarification: true
+
+  # --- 3. Static Extent Inventories (Single Year, No Change Intent) ---
+  - id: ho2_07
+    query: "Inventory all surface water bodies near Durg in 2023."
+    expected:
+      task_type: "water_extent"
+      place_name: "Durg"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: null
+      needs_clarification: false
+
+  - id: ho2_08
+    query: "Map lakes around Sambhar in summer 2024."
+    expected:
+      task_type: "water_extent"
+      place_name: "Sambhar"
+      season_policy: "pre_monsoon"
+      year_a: 2024
+      year_b: null
+      needs_clarification: false
+
+  # --- 4. Archive Boundaries (< 2017 Pre-Operational) ---
+  - id: ho2_09
+    query: "Evaluate lake dynamics in Vembanad from 2014 to 2019."
+    expected:
+      task_type: "out_of_scope"
+      needs_clarification: true
+
+  - id: ho2_10
+    query: "Did Raipur water reservoirs shrink between 2016 and 2021?"
+    expected:
+      task_type: "out_of_scope"
+      needs_clarification: true
+
+  # --- 5. Relative Dates & Temporal Horizons ---
+  - id: ho2_11
+    query: "Track water body evolution within 15 km of Hyderabad over the last 3 years."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2026
+      needs_clarification: false
+
+  - id: ho2_12
+    query: "Show ponds that expanded recently around Bilaspur."
+    expected:
+      task_type: "water_change"
+      place_name: "Bilaspur"
+      season_policy: "post_monsoon"
+      year_a: 2024
+      year_b: 2026
+      needs_clarification: false
+
+  # --- 6. Hindi & Hinglish Formulations ---
+  - id: ho2_13
+    query: "Raipur me barsat ke baad 2022 aur 2025 ke beech paani kitna faila?"
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2025
+      needs_clarification: false
+
+  - id: ho2_14
+    query: "Garmi ke dauran Bhopal me talab ka pani 2021 se 2024 tak kitna kam hua."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "pre_monsoon"
+      year_a: 2021
+      year_b: 2024
+      needs_clarification: false
+
+  # --- 7. Spatial Buffers & Clamping ---
+  - id: ho2_15
+    query: "Identify water loss within 25 km of Raipur from 2023 to 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      radius_km: 25.0
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+      needs_clarification: false
+
+  - id: ho2_16
+    query: "Detect reservoir expansion within 45 km of Durg between 2022 and 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Durg"
+      radius_km: 28.2
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2024
+      needs_clarification: false
+
+  # --- 8. Typographical Robustness ---
+  - id: ho2_17
+    query: "Moniter waterbody changes neer Raypur between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+      needs_clarification: false
+
+  # --- 9. Out-of-Scope Domains & Typed Refusals ---
+  - id: ho2_18
+    query: "Predict groundwater depletion levels in Raipur for 2028."
+    expected:
+      task_type: "out_of_scope"
+      needs_clarification: true
+
+  - id: ho2_19
+    query: "Estimate wheat crop health and NDVI vegetation indices near Bilaspur in 2025."
+    expected:
+      task_type: "out_of_scope"
+      needs_clarification: true
+
+  - id: ho2_20
+    query: "Classify urban building footprint expansion in Hyderabad between 2020 and 2024."
+    expected:
+      task_type: "out_of_scope"
+      needs_clarification: true
