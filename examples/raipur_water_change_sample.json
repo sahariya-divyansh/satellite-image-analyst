@@ -3,29 +3,242 @@
   "task_type": "water_change",
   "aoi": {
     "place_name": "Raipur",
-    "bbox": [81.50, 21.15, 81.80, 21.35],
+    "centroid": [
+      21.2380912,
+      81.6336993
+    ],
+    "radius_km": 15.0,
+    "bbox": [
+      81.48870071871478,
+      21.103045223154265,
+      81.77896206081788,
+      21.373003559733245
+    ],
     "crs": "EPSG:32644"
   },
   "temporal": {
     "period_a": {
-      "season": "post_monsoon",
-      "window": "2023-10-01 to 2023-11-30"
+      "window": "Post-Monsoon Oct-Nov 2023",
+      "scenes_count": 33,
+      "scene_ids": [
+        "S2B_MSIL2A_20231005T050649_R019_T44QNJ_20231005T113545",
+        "S2B_MSIL2A_20231005T050649_R019_T44QNJ_20241102T034241",
+        "S2A_MSIL2A_20231007T045701_R119_T44QNJ_20231007T111109",
+        "S2A_MSIL2A_20231010T050721_R019_T44QNJ_20231010T111834",
+        "S2A_MSIL2A_20231010T050721_R019_T44QNJ_20241101T170510",
+        "S2B_MSIL2A_20231012T045729_R119_T44QNJ_20231012T101202",
+        "S2B_MSIL2A_20231015T050759_R019_T44QNJ_20231015T100936",
+        "S2A_MSIL2A_20231017T045801_R119_T44QNJ_20231017T133228",
+        "S2A_MSIL2A_20231017T045801_R119_T44QNJ_20241108T053043",
+        "S2A_MSIL2A_20231020T050831_R019_T44QNJ_20231020T210327",
+        "S2B_MSIL2A_20231022T045839_R119_T44QNJ_20231022T092549",
+        "S2B_MSIL2A_20231022T045839_R119_T44QNJ_20240917T135946",
+        "S2B_MSIL2A_20231022T045839_R119_T44QNJ_20241102T222504",
+        "S2B_MSIL2A_20231025T050859_R019_T44QNJ_20231025T091827",
+        "S2A_MSIL2A_20231027T045911_R119_T44QNJ_20231027T094313",
+        "S2A_MSIL2A_20231027T045911_R119_T44QNJ_20241108T093400",
+        "S2A_MSIL2A_20231030T050931_R019_T44QNJ_20231030T203808",
+        "S2B_MSIL2A_20231101T045939_R119_T44QNJ_20231101T093612",
+        "S2B_MSIL2A_20231104T050959_R019_T44QNJ_20231104T091943",
+        "S2A_MSIL2A_20231106T050001_R119_T44QNJ_20231106T090848",
+        "S2A_MSIL2A_20231106T050001_R119_T44QNJ_20240927T062832",
+        "S2A_MSIL2A_20231109T051021_R019_T44QNJ_20231109T093251",
+        "S2A_MSIL2A_20231109T051021_R019_T44QNJ_20241101T112756",
+        "S2B_MSIL2A_20231111T050029_R119_T44QNJ_20231111T112519",
+        "S2B_MSIL2A_20231111T050029_R119_T44QNJ_20241111T220042",
+        "S2B_MSIL2A_20231114T051049_R019_T44QNJ_20231114T091148",
+        "S2A_MSIL2A_20231116T050051_R119_T44QNJ_20231116T102330",
+        "S2A_MSIL2A_20231119T051111_R019_T44QNJ_20231119T094257",
+        "S2B_MSIL2A_20231121T050109_R119_T44QNJ_20231121T083338",
+        "S2B_MSIL2A_20231124T051119_R019_T44QNJ_20231124T082322",
+        "S2B_MSIL2A_20231124T051119_R019_T44QNJ_20241029T030457",
+        "S2A_MSIL2A_20231126T050121_R119_T44QNJ_20231126T092220",
+        "S2A_MSIL2A_20231129T051141_R019_T44QNJ_20231129T095547"
+      ],
+      "threshold": 0.0,
+      "method": "shared_otsu_fallback",
+      "water_fraction": 0.0185,
+      "bimodality_metric": 0.4979
     },
     "period_b": {
-      "season": "post_monsoon",
-      "window": "2025-10-01 to 2025-11-30"
+      "window": "Post-Monsoon Oct-Nov 2025",
+      "scenes_count": 22,
+      "scene_ids": [
+        "S2B_MSIL2A_20251001T045659_R119_T44QNJ_20251001T072915",
+        "S2A_MSIL2A_20251001T051241_R019_T44QNJ_20251001T074113",
+        "S2C_MSIL2A_20251009T050731_R019_T44QNJ_20251009T121014",
+        "S2B_MSIL2A_20251014T050659_R019_T44QNJ_20251014T082528",
+        "S2C_MSIL2A_20251016T045811_R119_T44QNJ_20251016T101721",
+        "S2A_MSIL2A_20251018T050231_R119_T44QNJ_20251018T081417",
+        "S2C_MSIL2A_20251019T050841_R019_T44QNJ_20251019T121214",
+        "S2B_MSIL2A_20251024T050809_R019_T44QNJ_20251024T071733",
+        "S2C_MSIL2A_20251105T050051_R119_T44QNJ_20251105T085011",
+        "S2A_MSIL2A_20251107T050231_R119_T44QNJ_20251107T075208",
+        "S2C_MSIL2A_20251108T051031_R019_T44QNJ_20251108T082159",
+        "S2B_MSIL2A_20251110T045929_R119_T44QNJ_20251110T073214",
+        "S2A_MSIL2A_20251110T051241_R019_T44QNJ_20251110T075915",
+        "S2B_MSIL2A_20251113T050949_R019_T44QNJ_20251113T072146",
+        "S2C_MSIL2A_20251115T050101_R119_T44QNJ_20251115T085100",
+        "S2C_MSIL2A_20251118T051121_R019_T44QNJ_20251118T085417",
+        "S2B_MSIL2A_20251120T050019_R119_T44QNJ_20251120T072045",
+        "S2B_MSIL2A_20251123T051029_R019_T44QNJ_20251123T071241",
+        "S2C_MSIL2A_20251125T050141_R119_T44QNJ_20251125T083219",
+        "S2A_MSIL2A_20251127T050241_R119_T44QNJ_20251127T073922",
+        "S2C_MSIL2A_20251128T051201_R019_T44QNJ_20251128T101117",
+        "S2A_MSIL2A_20251130T051241_R019_T44QNJ_20251130T074610"
+      ],
+      "threshold": 0.0,
+      "method": "shared_otsu_fallback",
+      "water_fraction": 0.019,
+      "bimodality_metric": 0.4979
     }
   },
   "methodology": {
     "index": "MNDWI",
     "formula": "(Green - SWIR1) / (Green + SWIR1)",
-    "min_area_ha": 0.1
+    "threshold_policy": "shared",
+    "applied_threshold": 0.0,
+    "method": "shared_otsu_fallback",
+    "min_area_ha": 0.1,
+    "cloud_masking": "SCL classes 0, 1, 3, 8, 9, 10, 11 masked",
+    "radiometric_calibration": "ESA Baseline >=04.00 BOA_ADD_OFFSET = -1000"
   },
   "statistics": {
-    "status": "not_run",
-    "description": "Will be populated exclusively from real runs of the Phase 2 analysis pipeline."
+    "total_water_period_a_ha": 1674.99,
+    "total_water_period_b_ha": 1721.65,
+    "net_change_ha": 46.66,
+    "percent_change": 2.79,
+    "gained_water_ha": 276.29,
+    "lost_water_ha": 229.63,
+    "persistent_water_ha": 1445.36,
+    "waterbody_count": 1403,
+    "valid_area_fraction": 1.0,
+    "total_aoi_ha": 90750.0,
+    "valid_aoi_ha": 90750.0
+  },
+  "top_expanded_waterbodies": [
+    {
+      "waterbody_id": "wb_32608d46",
+      "centroid_lon": 81.60562,
+      "centroid_lat": 21.1938,
+      "area_period_a_ha": 37.58,
+      "area_period_b_ha": 47.24,
+      "net_change_ha": 9.66,
+      "percent_change": 25.71,
+      "status": "expanded"
+    },
+    {
+      "waterbody_id": "wb_f980a735",
+      "centroid_lon": 81.55202,
+      "centroid_lat": 21.34782,
+      "area_period_a_ha": 9.87,
+      "area_period_b_ha": 18.44,
+      "net_change_ha": 8.57,
+      "percent_change": 86.83,
+      "status": "expanded"
+    },
+    {
+      "waterbody_id": "wb_d5098d73",
+      "centroid_lon": 81.50356,
+      "centroid_lat": 21.29706,
+      "area_period_a_ha": 34.93,
+      "area_period_b_ha": 42.85,
+      "net_change_ha": 7.92,
+      "percent_change": 22.67,
+      "status": "expanded"
+    },
+    {
+      "waterbody_id": "wb_d0798956",
+      "centroid_lon": 81.70294,
+      "centroid_lat": 21.35121,
+      "area_period_a_ha": 0.52,
+      "area_period_b_ha": 7.53,
+      "net_change_ha": 7.01,
+      "percent_change": 1348.08,
+      "status": "expanded"
+    },
+    {
+      "waterbody_id": "wb_8dcb2c0d",
+      "centroid_lon": 81.55734,
+      "centroid_lat": 21.23902,
+      "area_period_a_ha": 22.13,
+      "area_period_b_ha": 27.34,
+      "net_change_ha": 5.21,
+      "percent_change": 23.54,
+      "status": "expanded"
+    }
+  ],
+  "top_shrunk_waterbodies": [
+    {
+      "waterbody_id": "wb_46817168",
+      "centroid_lon": 81.60958,
+      "centroid_lat": 21.15567,
+      "area_period_a_ha": 53.35,
+      "area_period_b_ha": 40.48,
+      "net_change_ha": -12.87,
+      "percent_change": -24.12,
+      "status": "shrunk"
+    },
+    {
+      "waterbody_id": "wb_97aea60b",
+      "centroid_lon": 81.74644,
+      "centroid_lat": 21.24061,
+      "area_period_a_ha": 49.79,
+      "area_period_b_ha": 41.28,
+      "net_change_ha": -8.51,
+      "percent_change": -17.09,
+      "status": "shrunk"
+    },
+    {
+      "waterbody_id": "wb_bc6aed59",
+      "centroid_lon": 81.60028,
+      "centroid_lat": 21.36007,
+      "area_period_a_ha": 17.52,
+      "area_period_b_ha": 9.56,
+      "net_change_ha": -7.96,
+      "percent_change": -45.43,
+      "status": "shrunk"
+    },
+    {
+      "waterbody_id": "wb_ff4cc75a",
+      "centroid_lon": 81.65011,
+      "centroid_lat": 21.20016,
+      "area_period_a_ha": 30.6,
+      "area_period_b_ha": 25.13,
+      "net_change_ha": -5.47,
+      "percent_change": -17.88,
+      "status": "shrunk"
+    },
+    {
+      "waterbody_id": "wb_c048ce5b",
+      "centroid_lon": 81.5936,
+      "centroid_lat": 21.34383,
+      "area_period_a_ha": 14.8,
+      "area_period_b_ha": 12.55,
+      "net_change_ha": -2.25,
+      "percent_change": -15.2,
+      "status": "shrunk"
+    }
+  ],
+  "known_reference_features": {
+    "budha_talab_vivekananda_sarovar": {
+      "waterbody_id": "wb_dca58935",
+      "centroid_lon": 81.63382,
+      "centroid_lat": 21.2324,
+      "area_period_a_ha": 26.75,
+      "area_period_b_ha": 26.98,
+      "net_change_ha": 0.23,
+      "percent_change": 0.86,
+      "status": "persistent"
+    }
   },
   "layers": {
-    "status": "not_run"
-  }
+    "change_raster_geotiff": "outputs/raipur_2023_2025_post_monsoon_change_classes.tif",
+    "change_vectors_geojson": "outputs/raipur_2023_2025_post_monsoon_change_vectors.geojson",
+    "waterbodies_geojson": "outputs/raipur_2023_2025_post_monsoon_waterbodies.geojson",
+    "waterbodies_csv": "outputs/raipur_2023_2025_post_monsoon_waterbodies.csv",
+    "diagnostic_overlay_png": "docs/images/raipur_2023_2025_water_change_overlay.png"
+  },
+  "software_version": "0.1.0",
+  "timestamp": "2026-10-25T06:51:49.232089+00:00"
 }
