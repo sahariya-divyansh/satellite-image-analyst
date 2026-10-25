@@ -1,13 +1,13 @@
 {
   "dataset": "golden_heldout_v2.yaml",
   "total_queries": 20,
-  "exact_match_count": 19,
-  "exact_match_pct": 95.0,
-  "task_acc_pct": 95.0,
-  "place_acc_pct": 95.0,
-  "season_acc_pct": 95.0,
-  "year_acc_pct": 95.0,
-  "clarification_acc_pct": 95.0,
+  "exact_match_count": 20,
+  "exact_match_pct": 100.0,
+  "task_acc_pct": 100.0,
+  "place_acc_pct": 100.0,
+  "season_acc_pct": 100.0,
+  "year_acc_pct": 100.0,
+  "clarification_acc_pct": 100.0,
   "results_detail": [
     {
       "id": "ho2_01",
@@ -282,7 +282,8 @@
     {
       "id": "ho2_16",
       "query": "Detect reservoir expansion within 45 km of Durg between 2022 and 2024.",
-      "exact": false,
+      "exact": true,
+      "guardrail_triggered": "AOIAreaExceededError",
       "error": "Requested AOI area (3181.0 km\u00b2) exceeds maximum allowed threshold (2500.0 km\u00b2). Reduce radius or specify a smaller region."
     },
     {

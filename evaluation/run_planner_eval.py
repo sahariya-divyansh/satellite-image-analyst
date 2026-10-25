@@ -101,14 +101,32 @@ def run_planner_eval(
                 }
             )
         except Exception as e:
-            results_detail.append(
-                {
-                    "id": qid,
-                    "query": q_str,
-                    "exact": False,
-                    "error": str(e),
-                }
-            )
+            expected_err = expected.get("error_type")
+            if expected_err and (e.__class__.__name__ == expected_err or expected_err in str(e)):
+                exact_match += 1
+                task_match += 1
+                place_match += 1
+                season_match += 1
+                year_match += 1
+                clarification_match += 1
+                results_detail.append(
+                    {
+                        "id": qid,
+                        "query": q_str,
+                        "exact": True,
+                        "guardrail_triggered": e.__class__.__name__,
+                        "error": str(e),
+                    }
+                )
+            else:
+                results_detail.append(
+                    {
+                        "id": qid,
+                        "query": q_str,
+                        "exact": False,
+                        "error": str(e),
+                    }
+                )
 
     summary = {
         "dataset": dataset_name,

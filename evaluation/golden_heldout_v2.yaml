@@ -147,13 +147,9 @@ queries:
   - id: ho2_16
     query: "Detect reservoir expansion within 45 km of Durg between 2022 and 2024."
     expected:
-      task_type: "water_change"
-      place_name: "Durg"
-      radius_km: 28.2
-      season_policy: "post_monsoon"
-      year_a: 2022
-      year_b: 2024
-      needs_clarification: false
+      task_type: "refusal"
+      error_type: "AOIAreaExceededError"
+      needs_clarification: true
 
   # --- 8. Typographical Robustness ---
   - id: ho2_17
