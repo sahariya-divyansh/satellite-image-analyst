@@ -1,13 +1,13 @@
 """Tests for summary stats and vectorization utilities."""
 
+import numpy as np
+
 from satellite_analyst.analysis.stats import (
-    AreaSummaryStats,
     WaterBodyRecord,
     compute_summary_stats,
 )
 from satellite_analyst.analysis.vectorize import estimate_utm_epsg, vectorize_change_raster
 from satellite_analyst.analysis.water import create_water_mask
-import numpy as np
 
 
 def test_estimate_utm_epsg() -> None:
