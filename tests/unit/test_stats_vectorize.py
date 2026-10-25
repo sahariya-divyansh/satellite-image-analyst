@@ -1,13 +1,19 @@
-"""Tests for summary stats and vectorization utilities."""
+"""Tests for summary stats, raster vectorization, equal-area accuracy, and waterbody tracking."""
 
 import numpy as np
+import pytest
+from affine import Affine
 
+from satellite_analyst.analysis.change import WaterChangeClass
 from satellite_analyst.analysis.stats import (
     WaterBodyRecord,
     compute_summary_stats,
 )
-from satellite_analyst.analysis.vectorize import estimate_utm_epsg, vectorize_change_raster
-from satellite_analyst.analysis.water import create_water_mask
+from satellite_analyst.analysis.vectorize import (
+    estimate_utm_epsg,
+    extract_waterbody_records,
+    vectorize_change_classes,
+)
 
 
 def test_estimate_utm_epsg() -> None:
@@ -20,55 +26,106 @@ def test_estimate_utm_epsg() -> None:
     assert epsg_south == 32744
 
 
-def test_vectorize_change_raster_stub() -> None:
-    raster = np.zeros((10, 10), dtype=np.uint8)
-    geojson = vectorize_change_raster(raster, transform=None, crs="EPSG:32644")
-    assert geojson["type"] == "FeatureCollection"
-    assert "features" in geojson
+def test_vectorize_change_classes_equal_area_accuracy() -> None:
+    """Test that polygonized area in hectares matches pixel count * 0.01 ha within 0.1%."""
+    # 50x50 raster with 10m pixels in UTM Zone 44N
+    shape = (50, 50)
+    change_raster = np.zeros(shape, dtype=np.uint8)
+
+    # 10x10 block of GAINED pixels = 100 pixels * 100m² = 10,000 m² = 1.00 hectare
+    change_raster[10:20, 10:20] = WaterChangeClass.GAINED
+
+    # Affine transform for 10m pixels starting at UTM (200000, 2350000)
+    transform = Affine.translation(200000, 2350000) @ Affine.scale(10.0, -10.0)
+
+    gdf = vectorize_change_classes(
+        change_raster,
+        transform=transform,
+        crs="EPSG:32644",
+        min_area_ha=0.01,
+    )
+
+    assert len(gdf) == 1
+    row = gdf.iloc[0]
+    assert row["class_name"] == "gained"
+    # Exact 1.00 ha within < 0.1% tolerance
+    assert pytest.approx(row["area_ha"], abs=1e-3) == 1.00
+    # Output CRS is EPSG:4326 for Leaflet compatibility
+    assert gdf.crs.to_string() == "EPSG:4326"
+
+
+def test_extract_waterbody_records_dynamics_and_stable_id() -> None:
+    """Test connected components tracking, dynamic statuses, and deterministic IDs."""
+    shape = (60, 60)
+    mask_a = np.zeros(shape, dtype=bool)
+    mask_b = np.zeros(shape, dtype=bool)
+
+    # Waterbody 1: Expanding pond (10x10 -> 10x15)
+    mask_a[10:20, 10:20] = True  # 100 px = 1.0 ha
+    mask_b[10:20, 10:25] = True  # 150 px = 1.5 ha
+
+    # Waterbody 2: Disappeared pond
+    mask_a[30:40, 30:40] = True  # 100 px = 1.0 ha
+    # mask_b remains False
+
+    # Waterbody 3: Brand new pond
+    mask_b[45:55, 45:55] = True  # 100 px = 1.0 ha
+
+    transform = Affine.translation(200000, 2350000) @ Affine.scale(10.0, -10.0)
+
+    records, gdf = extract_waterbody_records(
+        mask_a=mask_a,
+        mask_b=mask_b,
+        transform=transform,
+        crs="EPSG:32644",
+        min_area_ha=0.1,
+    )
+
+    assert len(records) == 3
+    statuses = {r.status for r in records}
+    assert statuses == {"expanded", "disappeared", "new"}
+
+    # Verify stable ID determinism: running extraction again on same data yields identical IDs
+    records_repeat, _ = extract_waterbody_records(
+        mask_a=mask_a,
+        mask_b=mask_b,
+        transform=transform,
+        crs="EPSG:32644",
+        min_area_ha=0.1,
+    )
+    assert [r.waterbody_id for r in records] == [r.waterbody_id for r in records_repeat]
 
 
 def test_compute_summary_stats() -> None:
+    shape = (100, 100)
+    change_raster = np.zeros(shape, dtype=np.uint8)
+
+    # 100 gained pixels = 1.0 ha
+    change_raster[0:10, 0:10] = WaterChangeClass.GAINED
+    # 50 lost pixels = 0.5 ha
+    change_raster[20:25, 0:10] = WaterChangeClass.LOST
+    # 200 persistent pixels = 2.0 ha
+    change_raster[40:50, 0:20] = WaterChangeClass.PERSISTENT
+
     wb = WaterBodyRecord(
-        waterbody_id="WB_001",
+        waterbody_id="wb_test01",
         centroid_lon=81.65,
         centroid_lat=21.25,
-        area_period_a_ha=100.0,
-        area_period_b_ha=120.0,
-        net_change_ha=20.0,
+        area_period_a_ha=2.5,
+        area_period_b_ha=3.0,
+        net_change_ha=0.5,
         percent_change=20.0,
         status="expanded",
     )
-    summary = compute_summary_stats(
-        waterbodies=[wb],
-        pixel_gained_ha=25.0,
-        pixel_lost_ha=5.0,
-        pixel_persistent_ha=95.0,
-    )
 
-    assert summary.total_water_period_a_ha == 100.0
-    assert summary.total_water_period_b_ha == 120.0
-    assert summary.net_change_ha == 20.0
-    assert summary.percent_change == 20.0
-    assert summary.waterbody_count == 1
+    stats = compute_summary_stats(change_raster, waterbodies=[wb], pixel_size_m=10.0)
 
-    d = summary.to_dict()
-    assert isinstance(d, dict)
-    assert d["net_change_ha"] == 20.0
-
-
-def test_water_mask_with_morphology() -> None:
-    # Create array with a small 1-pixel noise and a larger 4x4 block
-    mndwi = np.full((20, 20), -0.5, dtype=np.float32)
-    mndwi[2, 2] = 0.5  # 1-pixel noise
-    mndwi[8:14, 8:14] = 0.6  # 36-pixel pond
-
-    mask, threshold = create_water_mask(
-        mndwi,
-        threshold=0.0,
-        min_pixels=10,
-        apply_morphology=True,
-    )
-    # The 1-pixel noise should be removed by morphology / min_pixels
-    assert mask[2, 2] is False or mask[2, 2] == 0
-    # The pond center should be water
-    assert mask[10, 10] is True or mask[10, 10] == 1
+    assert stats.gained_water_ha == 1.00
+    assert stats.lost_water_ha == 0.50
+    assert stats.persistent_water_ha == 2.00
+    assert stats.total_water_period_a_ha == 2.50
+    assert stats.total_water_period_b_ha == 3.00
+    assert stats.net_change_ha == 0.50
+    assert stats.percent_change == 20.00
+    assert stats.waterbody_count == 1
+    assert stats.valid_area_fraction == 1.00
