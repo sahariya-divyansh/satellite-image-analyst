@@ -1,10 +1,12 @@
-"""OpenAI and OpenAI-compatible API provider implementation."""
+"""OpenAI and OpenAI-compatible API provider implementation using REST API."""
 
+import os
 from typing import Any
+
+import httpx
 
 from satellite_analyst.errors import PlanGenerationError
 from satellite_analyst.planner.llm_base import BaseLLMProvider
-from satellite_analyst.planner.schema import AnalysisPlan
 
 
 class OpenAIProvider(BaseLLMProvider):
@@ -18,25 +20,56 @@ class OpenAIProvider(BaseLLMProvider):
         **kwargs: Any,
     ) -> None:
         super().__init__(model_name=model_name, **kwargs)
-        self.api_key = api_key
-        self.base_url = base_url
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
+        self.base_url = (
+            base_url or os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
+        ).rstrip("/")
 
-    async def generate_plan(self, query: str) -> AnalysisPlan:
-        """Call OpenAI-compatible chat completion with structured JSON output."""
+    async def generate_plan(self, query: str) -> Any:
+        """Parse natural language query into a validated QueryPlan."""
         if not self.api_key:
             raise PlanGenerationError(
                 query=query,
                 reason="OPENAI_API_KEY is not configured. Falling back to rule-based planner.",
             )
-        raise NotImplementedError("OpenAIProvider live execution enabled in Phase 3.")
+        return await super().generate_plan(query)
 
-    async def generate_narrative(
+    async def generate_chat_completion(
         self,
-        _plan: AnalysisPlan,
-        _stats: dict[str, Any],
-        _provenance: dict[str, Any],
+        system_prompt: str,
+        user_prompt: str,
+        json_schema: dict[str, Any] | None = None,
     ) -> str:
-        """Generate narrative grounded strictly in computed statistics."""
+        """Call OpenAI-compatible chat completions endpoint."""
         if not self.api_key:
-            raise RuntimeError("OPENAI_API_KEY is not configured.")
-        raise NotImplementedError("OpenAI narrative generation enabled in Phase 3.")
+            raise PlanGenerationError(
+                query=user_prompt,
+                reason="OPENAI_API_KEY is not configured. Falling back to rule-based planner.",
+            )
+
+        url = f"{self.base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload: dict[str, Any] = {
+            "model": self.model_name,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "temperature": 0.0,
+        }
+        if json_schema:
+            payload["response_format"] = {"type": "json_object"}
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(url, headers=headers, json=payload)
+            if resp.status_code != 200:
+                raise RuntimeError(f"OpenAI API returned HTTP {resp.status_code}: {resp.text}")
+            data = resp.json()
+            choices = data.get("choices", [])
+            if not choices:
+                raise RuntimeError("OpenAI API returned no choices")
+            content = choices[0].get("message", {}).get("content", "")
+            return str(content)
