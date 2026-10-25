@@ -190,3 +190,27 @@ def test_threshold_sensitivity_evaluation() -> None:
     assert sens.net_change_mid_ha == 1.0
     assert sens.net_change_high_ha == 0.0
     assert sens.sign_flips is False  # Min is 0.0, not negative
+
+
+def test_report_area_equals_analysed_valid_area() -> None:
+    """Test that report area matches analysed valid bounding box area exactly."""
+    # 200x200 raster with 10m pixels -> 40,000 pixels * 0.01 ha = 400.0 ha = 4.0 km²
+    shape = (200, 200)
+    change_raster = np.zeros(shape, dtype=np.uint8)
+    # Set 500 pixels as NODATA (255)
+    change_raster[0:25, 0:20] = WaterChangeClass.NODATA
+
+    stats = compute_summary_stats(change_raster, waterbodies=[], pixel_size_m=10.0)
+
+    assert stats.total_aoi_ha == 400.0
+    assert stats.total_aoi_km2 == 4.0
+    assert stats.valid_aoi_ha == 395.0
+    assert stats.valid_aoi_km2 == 3.95
+    assert stats.valid_area_fraction == 0.9875
+
+    # Check that to_dict exports these fields
+    d = stats.to_dict()
+    assert d["total_aoi_km2"] == 4.0
+    assert d["valid_aoi_km2"] == 3.95
+    assert d["total_aoi_ha"] == 400.0
+    assert d["valid_aoi_ha"] == 395.0

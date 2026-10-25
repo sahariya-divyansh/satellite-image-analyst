@@ -46,9 +46,22 @@ class AreaSummaryStats:
     valid_aoi_ha: float
     headline_1ha: dict[str, Any]
 
+    @property
+    def total_aoi_km2(self) -> float:
+        """Total bounding box AOI area in square kilometers."""
+        return round(self.total_aoi_ha / 100.0, 2)
+
+    @property
+    def valid_aoi_km2(self) -> float:
+        """Clear-sky valid analyzed AOI area in square kilometers."""
+        return round(self.valid_aoi_ha / 100.0, 2)
+
     def to_dict(self) -> dict[str, Any]:
         """Convert summary statistics to dictionary representation."""
-        return asdict(self)
+        d = asdict(self)
+        d["total_aoi_km2"] = self.total_aoi_km2
+        d["valid_aoi_km2"] = self.valid_aoi_km2
+        return d
 
 
 @dataclass

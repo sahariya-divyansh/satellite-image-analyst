@@ -427,8 +427,12 @@ class RuleBasedPlanner:
         else:
             dynamic_desc = f"a net change in surface water of {abs(net_delta):.2f} hectares ({pct_change:+.2f}%), evaluated as {significance}"
 
+        total_aoi_km2 = stats.get("total_aoi_ha", 0.0) / 100.0
+        total_aoi_ha = stats.get("total_aoi_ha", 0.0)
+
         narrative = (
-            f"Analysis of {plan.aoi.place_name} between {plan.time_range_a.label} and "
+            f"Analysis of {plan.aoi.place_name} across the {total_aoi_km2:.2f} km² ({total_aoi_ha:,.1f} ha) "
+            f"bounding box area of interest between {plan.time_range_a.label} and "
             f"{plan.time_range_b.label if plan.time_range_b else 'N/A'} indicates {dynamic_desc}. "
             f"Persistent water accounted for {stats.get('persistent_water_ha', 0.0):.2f} ha, "
             f"while gained water totaled {stats.get('gained_water_ha', 0.0):.2f} ha and "

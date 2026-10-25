@@ -100,6 +100,7 @@
 
   <div class="provenance">
     Target AOI Bounding Box (WGS84): {{ provenance.bbox }}<br>
+    Analysis Bounding Box Area: {{ (stats.total_aoi_ha / 100.0) | round(2) }} km² ({{ stats.total_aoi_ha }} ha) | Valid Analyzed Area: {{ ((stats.valid_aoi_ha if stats.valid_aoi_ha is defined else stats.total_aoi_ha) / 100.0) | round(2) }} km² ({{ stats.valid_aoi_ha if stats.valid_aoi_ha is defined else stats.total_aoi_ha }} ha)<br>
     Equal-Area Projection: {{ provenance.crs }} (10m GSD)<br>
     Vector Attributes: <code>waterbody_id</code>, <code>status</code>, <code>area_period_a_ha</code>, <code>area_period_b_ha</code>, <code>net_change_ha</code>, <code>percent_change</code>, <code>geometry</code><br>
     Spectral Index: Modified Normalized Difference Water Index (MNDWI)<br>

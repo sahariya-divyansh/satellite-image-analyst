@@ -104,6 +104,7 @@
 
 - **Projected Coordinate Reference System**: `{{ provenance.crs }}`
 - **Analysis Extent (WGS84 Bounding Box)**: `{{ provenance.bbox }}`
+- **Analysis Bounding Box Area**: {{ (stats.total_aoi_ha / 100.0) | round(2) }} km² ({{ stats.total_aoi_ha }} ha), Valid Analyzed Area: {{ ((stats.valid_aoi_ha if stats.valid_aoi_ha is defined else stats.total_aoi_ha) / 100.0) | round(2) }} km² ({{ stats.valid_aoi_ha if stats.valid_aoi_ha is defined else stats.total_aoi_ha }} ha)
 - **Vector Attributes**: `waterbody_id`, `status`, `area_period_a_ha`, `area_period_b_ha`, `net_change_ha`, `percent_change`, `geometry`
 - **Software**: `satellite-analyst` v{{ software_version }}
 - **Planner Used**: `{{ plan.planner_used if plan.planner_used else 'rule_based' }}`

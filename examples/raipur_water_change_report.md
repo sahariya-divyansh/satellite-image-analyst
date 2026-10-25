@@ -29,7 +29,7 @@
 
 **Scientific Assessment**: **WITHIN NOISE / INCONCLUSIVE**
 
-Analysis of Raipur between Post-Monsoon Oct-Nov 2023 and Post-Monsoon Oct-Nov 2025 indicates a net change in surface water of 46.66 hectares (+2.79%), evaluated as within noise / inconclusive. Persistent water accounted for 1445.36 ha, while gained water totaled 276.29 ha and lost water totaled 229.63 ha. The observed churn ratio was 25.93%.
+Analysis of Raipur across the 907.50 km² (90,750.0 ha) bounding box area of interest between Post-Monsoon Oct-Nov 2023 and Post-Monsoon Oct-Nov 2025 indicates a net change in surface water of 46.66 hectares (+2.79%), evaluated as within noise / inconclusive. Persistent water accounted for 1445.36 ha, while gained water totaled 276.29 ha and lost water totaled 229.63 ha. The observed churn ratio was 25.93%.
 
 ### Quantitative Area Summary
 

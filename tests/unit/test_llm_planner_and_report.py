@@ -248,6 +248,7 @@ def test_report_generator_bundle_and_documents() -> None:
         "waterbody_count": 1403,
         "valid_area_fraction": 1.0,
         "total_aoi_ha": 90750.0,
+        "valid_aoi_ha": 90750.0,
         "headline_1ha": {
             "count": 406,
             "total_water_period_a_ha": 1331.4,
