@@ -1,5 +1,6 @@
 """STAC client for Sentinel-2 L2A querying with Planetary Computer and Earth Search auto-fallback."""
 
+import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -187,7 +188,22 @@ class STACClient:
                 props.get("s2:mgrs_tile")
                 or f"{props.get('mgrs:utm_zone', '')}{props.get('mgrs:latitude_band', '')}{props.get('mgrs:grid_square', '')}"
             )
-            baseline = str(props.get("s2:processing_baseline", "04.00"))
+            # Determine processing baseline per item
+            raw_baseline = props.get("s2:processing_baseline") or props.get("processing:version")
+            if raw_baseline:
+                baseline = str(raw_baseline)
+            else:
+                # Check for ESA N-tag in scene ID: e.g. S2A_..._N0214_... -> 02.14
+                n_match = re.search(r"_N(\d{2})(\d{2})_", str(item.id))
+                if n_match:
+                    baseline = f"{n_match.group(1)}.{n_match.group(2)}"
+                else:
+                    item_dt_str = str(getattr(item, "datetime", "") or props.get("datetime", ""))
+                    # ESA Baseline 04.00 was deployed operationally on 25 January 2022
+                    if item_dt_str and item_dt_str[:10] < "2022-01-25":
+                        baseline = "02.14"
+                    else:
+                        baseline = "04.00"
 
             # Extract asset hrefs for relevant bands
             assets_dict: dict[str, str] = {}

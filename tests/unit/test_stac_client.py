@@ -118,6 +118,56 @@ def test_stac_both_providers_fail_raises_typed_error(
         assert "Both STAC providers failed" in exc_info.value.message
 
 
+def test_stac_per_item_baseline_detection(
+    tmp_path: Path, dummy_bbox: BoundingBox, dummy_interval: TimeInterval
+) -> None:
+    """STAC client resolves per-item processing baseline dynamically from props, N-tag, or acquisition date."""
+    from unittest.mock import MagicMock
+
+    cache = RasterDataCache(cache_dir=tmp_path)
+    client = STACClient(provider="earth_search", cache=cache)
+
+    # 1. Legacy item with explicit s2:processing_baseline
+    item_legacy = MagicMock()
+    item_legacy.id = "S2A_MSIL2A_20201015T051751_R019_T44QNJ_20201015T080000"
+    item_legacy.datetime = "2020-10-15T05:17:51Z"
+    item_legacy.properties = {"s2:processing_baseline": "02.14", "eo:cloud_cover": 5.0}
+    item_legacy.assets = {"B03": MagicMock(href="https://example.com/b03.tif")}
+
+    # 2. Legacy item with N-tag in ID
+    item_ntag = MagicMock()
+    item_ntag.id = "S2B_MSIL2A_20210320T050649_N0300_R019_T44QNJ_20210320T080000"
+    item_ntag.datetime = "2021-03-20T05:06:49Z"
+    item_ntag.properties = {"eo:cloud_cover": 2.0}
+    item_ntag.assets = {"B03": MagicMock(href="https://example.com/b03.tif")}
+
+    # 3. Modern 2023 item
+    item_modern = MagicMock()
+    item_modern.id = "S2A_MSIL2A_20231015T050721_N0509_R019_T44QNJ_20231015T110000"
+    item_modern.datetime = "2023-10-15T05:07:21Z"
+    item_modern.properties = {"s2:processing_baseline": "05.09", "eo:cloud_cover": 1.0}
+    item_modern.assets = {"B03": MagicMock(href="https://example.com/b03.tif")}
+
+    mock_pystac_client = MagicMock()
+    mock_search = MagicMock()
+    mock_search.items.return_value = [item_legacy, item_ntag, item_modern]
+    mock_pystac_client.search.return_value = mock_search
+
+    with patch("pystac_client.Client.open", return_value=mock_pystac_client):
+        collection = client._execute_search(
+            provider="earth_search",
+            bbox=dummy_bbox,
+            time_range=dummy_interval,
+            max_cloud_cover=40.0,
+            limit=10,
+        )
+
+    assert len(collection.items) == 3
+    assert collection.items[0].processing_baseline == "02.14"
+    assert collection.items[1].processing_baseline == "03.00"
+    assert collection.items[2].processing_baseline == "05.09"
+
+
 @pytest.mark.network
 def test_live_stac_planetary_computer_query(
     dummy_bbox: BoundingBox, dummy_interval: TimeInterval
