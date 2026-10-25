@@ -1,0 +1,335 @@
+{
+  "total_queries": 42,
+  "exact_match_count": 36,
+  "exact_match_pct": 85.71,
+  "task_acc_pct": 90.48,
+  "place_acc_pct": 85.71,
+  "season_acc_pct": 90.48,
+  "year_acc_pct": 90.48,
+  "results_detail": [
+    {
+      "id": "gq_01",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_02",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_03",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_04",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_05",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_06",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_07",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_08",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_09",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_10",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_11",
+      "exact": false,
+      "error": "Failed to geocode location 'Vembanad for': Nominatim returned no results"
+    },
+    {
+      "id": "gq_12",
+      "exact": false,
+      "error": "Failed to geocode location 'Sambhar for': Nominatim returned no results"
+    },
+    {
+      "id": "gq_13",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_14",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_15",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_16",
+      "exact": false,
+      "error": "Failed to geocode location 'Sambhar comparing': Nominatim returned no results"
+    },
+    {
+      "id": "gq_17",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_18",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_19",
+      "exact": false,
+      "task_ok": true,
+      "place_ok": false,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_20",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_21",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_22",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_23",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_24",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_25",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_26",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_27",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_28",
+      "exact": false,
+      "task_ok": true,
+      "place_ok": false,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_29",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_30",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_31",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_32",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_33",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_34",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_35",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_36",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_37",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_38",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_39",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_40",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    },
+    {
+      "id": "gq_41",
+      "exact": false,
+      "error": "Failed to geocode location 'Sambhar for': Nominatim returned no results"
+    },
+    {
+      "id": "gq_42",
+      "exact": true,
+      "task_ok": true,
+      "place_ok": true,
+      "season_ok": true,
+      "year_ok": true
+    }
+  ]
+}

@@ -1,0 +1,381 @@
+# Golden Benchmark Query Suite for Natural-Language Satellite Image Analyst
+# Contains 42 curated queries covering diverse geographical phrasing, seasons, tasks, and edge cases.
+
+queries:
+  - id: gq_01
+    query: "Show all water bodies that expanded near Raipur between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_02
+    query: "Analyze water body changes in Raipur from 2022 to 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2024
+
+  - id: gq_03
+    query: "Detect lake surface area retraction near Bhopal between 2021 and 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "post_monsoon"
+      year_a: 2021
+      year_b: 2023
+
+  - id: gq_04
+    query: "Map water extent in Raipur during 2023."
+    expected:
+      task_type: "water_extent"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: null
+
+  - id: gq_05
+    query: "Evaluate Sambhar Lake surface water dynamics between 2020 and 2024 during pre-monsoon."
+    expected:
+      task_type: "water_change"
+      place_name: "Sambhar"
+      season_policy: "pre_monsoon"
+      year_a: 2020
+      year_b: 2024
+
+  - id: gq_06
+    query: "Track wetland change across Vembanad between 2022 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Vembanad"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2025
+
+  - id: gq_07
+    query: "Show water shrinkage in Hyderabad from 2023 to 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_08
+    query: "What water bodies expanded in Raipur between 2019 and 2024?"
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2019
+      year_b: 2024
+
+  - id: gq_09
+    query: "Monitor summer water retention in Bhopal between 2022 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "pre_monsoon"
+      year_a: 2022
+      year_b: 2025
+
+  - id: gq_10
+    query: "Find all reservoirs that gained water near Raipur 2021 to 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2021
+      year_b: 2023
+
+  - id: gq_11
+    query: "Measure post-monsoon water spread in Vembanad for 2024."
+    expected:
+      task_type: "water_extent"
+      place_name: "Vembanad"
+      season_policy: "post_monsoon"
+      year_a: 2024
+      year_b: null
+
+  - id: gq_12
+    query: "Map dry season lake extent in Sambhar for 2023."
+    expected:
+      task_type: "water_extent"
+      place_name: "Sambhar"
+      season_policy: "pre_monsoon"
+      year_a: 2023
+      year_b: null
+
+  - id: gq_13
+    query: "Compare surface water around Raipur between 2020 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2020
+      year_b: 2025
+
+  - id: gq_14
+    query: "Surface water loss detection in Hyderabad 2022 vs 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2024
+
+  - id: gq_15
+    query: "Identify wetland gain in Vembanad between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Vembanad"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_16
+    query: "Pre-monsoon drought assessment in Sambhar comparing 2021 and 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Sambhar"
+      season_policy: "pre_monsoon"
+      year_a: 2021
+      year_b: 2024
+
+  - id: gq_17
+    query: "Show water body expansion near Bhopal between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_18
+    query: "Track water bodies around Raipur 2018 to 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2018
+      year_b: 2023
+
+  - id: gq_19
+    query: "Delineate water bodies in Raipur for 2025."
+    expected:
+      task_type: "water_extent"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2025
+      year_b: null
+
+  - id: gq_20
+    query: "Examine water surface change in Vembanad from 2020 to 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Vembanad"
+      season_policy: "post_monsoon"
+      year_a: 2020
+      year_b: 2023
+
+  - id: gq_21
+    query: "Summer surface water shrinkage in Hyderabad between 2021 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "pre_monsoon"
+      year_a: 2021
+      year_b: 2025
+
+  - id: gq_22
+    query: "Find newly created water retention ponds near Raipur between 2022 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2025
+
+  - id: gq_23
+    query: "Pre-monsoon Sambhar Lake water levels 2022 vs 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Sambhar"
+      season_policy: "pre_monsoon"
+      year_a: 2022
+      year_b: 2025
+
+  - id: gq_24
+    query: "Water body loss detection near Bhopal between 2022 and 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2024
+
+  - id: gq_25
+    query: "Post-monsoon surface water in Hyderabad 2024."
+    expected:
+      task_type: "water_extent"
+      place_name: "Hyderabad"
+      season_policy: "post_monsoon"
+      year_a: 2024
+      year_b: null
+
+  - id: gq_26
+    query: "Show all water bodies that expanded in Sambhar between 2021 and 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Sambhar"
+      season_policy: "post_monsoon"
+      year_a: 2021
+      year_b: 2023
+
+  - id: gq_27
+    query: "Analyze water changes near Vembanad during March to May between 2022 and 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Vembanad"
+      season_policy: "pre_monsoon"
+      year_a: 2022
+      year_b: 2024
+
+  - id: gq_28
+    query: "Map lakes near Bhopal for 2021."
+    expected:
+      task_type: "water_extent"
+      place_name: "Bhopal"
+      season_policy: "post_monsoon"
+      year_a: 2021
+      year_b: null
+
+  - id: gq_29
+    query: "Quantify reservoir gain near Raipur between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_30
+    query: "Water surface area in Sambhar during 2024 pre monsoon."
+    expected:
+      task_type: "water_extent"
+      place_name: "Sambhar"
+      season_policy: "pre_monsoon"
+      year_a: 2024
+      year_b: null
+
+  - id: gq_31
+    query: "Track flood expansion near Raipur between 2020 and 2022."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2020
+      year_b: 2022
+
+  - id: gq_32
+    query: "Detect surface water change near Hyderabad between 2020 and 2023."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "post_monsoon"
+      year_a: 2020
+      year_b: 2023
+
+  - id: gq_33
+    query: "Water body shrinkage in Vembanad from 2021 to 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Vembanad"
+      season_policy: "post_monsoon"
+      year_a: 2021
+      year_b: 2024
+
+  - id: gq_34
+    query: "Check lake replenishment in Bhopal between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_35
+    query: "Survey water bodies near Raipur during 2022."
+    expected:
+      task_type: "water_extent"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: null
+
+  - id: gq_36
+    query: "Pre-monsoon water body contraction in Hyderabad from 2022 to 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "pre_monsoon"
+      year_a: 2022
+      year_b: 2025
+
+  - id: gq_37
+    query: "Find expanding ponds around Sambhar between 2022 and 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Sambhar"
+      season_policy: "post_monsoon"
+      year_a: 2022
+      year_b: 2024
+
+  - id: gq_38
+    query: "Surface water difference in Vembanad between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Vembanad"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025
+
+  - id: gq_39
+    query: "Compare pre-monsoon lake sizes in Bhopal 2021 and 2024."
+    expected:
+      task_type: "water_change"
+      place_name: "Bhopal"
+      season_policy: "pre_monsoon"
+      year_a: 2021
+      year_b: 2024
+
+  - id: gq_40
+    query: "Show water expansion near Raipur 2024 to 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Raipur"
+      season_policy: "post_monsoon"
+      year_a: 2024
+      year_b: 2025
+
+  - id: gq_41
+    query: "Map post-monsoon water spread in Sambhar for 2025."
+    expected:
+      task_type: "water_extent"
+      place_name: "Sambhar"
+      season_policy: "post_monsoon"
+      year_a: 2025
+      year_b: null
+
+  - id: gq_42
+    query: "Detect water loss across Hyderabad between 2023 and 2025."
+    expected:
+      task_type: "water_change"
+      place_name: "Hyderabad"
+      season_policy: "post_monsoon"
+      year_a: 2023
+      year_b: 2025

@@ -1,0 +1,29 @@
+services:
+  satellite-analyst:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: satellite-analyst-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+      - LOG_LEVEL=INFO
+      - CACHE_DIR=/app/data/cache
+      - DEFAULT_LLM_PROVIDER=rule_based
+      - GEOCODING_USER_AGENT=satellite-image-analyst-docker/0.1.0
+    volumes:
+      - cache_data:/app/data/cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  cache_data:
+    driver: local

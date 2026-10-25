@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Natural-Language Satellite Image Analyst</title>
+  <meta name="description" content="Translating natural-language Earth observation questions into defensible remote sensing pipelines.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Header -->
+    <header class="top-nav">
+      <div class="brand">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M3.6 9h16.8M3.6 15h16.8"/>
+          <path d="M11.5 3a17 17 0 0 0 0 18M12.5 3a17 17 0 0 1 0 18"/>
+        </svg>
+        <div>
+          <span class="brand-title">Natural-Language Satellite Image Analyst</span>
+          <span class="badge">Sentinel-2 L2A</span>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="/docs" target="_blank" class="nav-item">API Docs</a>
+        <a href="https://github.com/sahariya-divyansh/satellite-image-analyst" target="_blank" class="nav-item">GitHub</a>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Left Sidebar: Query, Controls, Report -->
+      <aside class="sidebar">
+        <!-- Query Section -->
+        <section class="card query-card">
+          <label for="query-input" class="card-title">Ask an Earth Observation Question</label>
+          <div class="input-wrapper">
+            <textarea id="query-input" rows="3" placeholder="e.g. Show all water bodies that expanded near Raipur between 2023 and 2025."></textarea>
+            <button id="submit-btn" class="btn btn-primary">
+              <span id="btn-text">Run Pipeline</span>
+              <div id="btn-spinner" class="spinner hidden"></div>
+            </button>
+          </div>
+
+          <div class="example-chips">
+            <span class="chip-label">Examples:</span>
+            <button class="chip" data-query="Show all water bodies that expanded near Raipur between 2023 and 2025.">Raipur Water Expansion (2023-2025)</button>
+            <button class="chip" data-query="Analyze water body changes in Sambhar Salt Lake between 2022 and 2024 during pre-monsoon.">Sambhar Playa (Pre-Monsoon)</button>
+            <button class="chip" data-query="Detect surface water contraction near Vembanad between 2021 and 2024.">Vembanad Wetland Dynamics</button>
+          </div>
+        </section>
+
+        <!-- Progress / Status Card -->
+        <section id="status-card" class="card status-card hidden">
+          <div class="status-header">
+            <span id="status-badge" class="badge badge-info">Initializing</span>
+            <span id="progress-percent" class="mono">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+          </div>
+          <p id="status-detail" class="status-detail">Translating intent into structured plan...</p>
+        </section>
+
+        <!-- Statistics & Report Tabs -->
+        <section id="results-card" class="card results-card hidden">
+          <div class="tab-header">
+            <button class="tab-btn active" data-tab="stats">Grounded Statistics</button>
+            <button class="tab-btn" data-tab="provenance">Provenance</button>
+            <button class="tab-btn" data-tab="report">Full Report</button>
+          </div>
+
+          <div id="tab-stats" class="tab-content active">
+            <div class="stat-grid">
+              <div class="stat-box">
+                <span class="stat-label">Net Surface Water Delta</span>
+                <span id="stat-net-change" class="stat-value text-accent">+0.0 ha</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Relative Change</span>
+                <span id="stat-percent-change" class="stat-value">+0.0%</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Persistent Water</span>
+                <span id="stat-persistent" class="stat-value text-blue">0.0 ha</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Gained Water</span>
+                <span id="stat-gained" class="stat-value text-teal">0.0 ha</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Lost Water</span>
+                <span id="stat-lost" class="stat-value text-amber">0.0 ha</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Monitored Waterbodies</span>
+                <span id="stat-count" class="stat-value">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-provenance" class="tab-content">
+            <div class="provenance-details mono" id="provenance-details">
+              Waiting for execution metadata...
+            </div>
+          </div>
+
+          <div id="tab-report" class="tab-content">
+            <div id="report-view" class="report-view markdown-body">
+              No report available yet.
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Center & Right: Interactive Map -->
+      <main class="map-container">
+        <div id="map"></div>
+
+        <!-- Floating Map Legend & Layer Controls -->
+        <div class="map-overlay legend-card">
+          <div class="legend-header">Map Layers</div>
+          <div class="layer-item">
+            <input type="checkbox" id="layer-persistent" checked>
+            <span class="legend-color legend-blue"></span>
+            <label for="layer-persistent">Persistent Water</label>
+          </div>
+          <div class="layer-item">
+            <input type="checkbox" id="layer-gained" checked>
+            <span class="legend-color legend-teal"></span>
+            <label for="layer-gained">Water Expansion (Gain)</label>
+          </div>
+          <div class="layer-item">
+            <input type="checkbox" id="layer-lost" checked>
+            <span class="legend-color legend-amber"></span>
+            <label for="layer-lost">Water Retraction (Loss)</label>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>

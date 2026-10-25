@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Earth Observation Report: {{ plan.aoi.place_name }}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    h1 { color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+    h2 { color: #1e3a8a; margin-top: 32px; }
+    .badge { display: inline-block; padding: 4px 10px; font-size: 0.85rem; font-weight: 600; border-radius: 4px; background: #e0f2fe; color: #0369a1; }
+    .summary-card { background: #f8fafc; border-left: 4px solid #0284c7; padding: 16px 20px; border-radius: 4px; margin: 20px 0; font-size: 1.05rem; }
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f1f5f9; font-weight: 600; }
+    .provenance { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; font-family: monospace; font-size: 0.9rem; }
+    .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b; }
+  </style>
+</head>
+<body>
+  <h1>Natural-Language Satellite Image Analyst Report</h1>
+  <p><span class="badge">{{ plan.aoi.place_name }}</span> <span class="badge">{{ plan.task_type }}</span> Generated {{ execution_time }} UTC</p>
+  
+  <h2>1. Executive Summary</h2>
+  <div class="summary-card">
+    {{ narrative }}
+  </div>
+
+  <h2>2. Quantitative Change Findings</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Baseline ({{ plan.time_range_a.label }})</th>
+        <th>Comparison ({{ plan.time_range_b.label if plan.time_range_b else 'N/A' }})</th>
+        <th>Delta</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Total Water Surface Area</strong></td>
+        <td>{{ stats.total_water_period_a_ha }} ha</td>
+        <td>{{ stats.total_water_period_b_ha }} ha</td>
+        <td><strong>{{ "+ " if stats.net_change_ha > 0 else "" }}{{ stats.net_change_ha }} ha ({{ stats.percent_change }}%)</strong></td>
+      </tr>
+      <tr>
+        <td>Gained Water</td>
+        <td>—</td>
+        <td>—</td>
+        <td>{{ stats.gained_water_ha }} ha</td>
+      </tr>
+      <tr>
+        <td>Lost Water</td>
+        <td>—</td>
+        <td>—</td>
+        <td>{{ stats.lost_water_ha }} ha</td>
+      </tr>
+      <tr>
+        <td>Persistent Water</td>
+        <td>—</td>
+        <td>—</td>
+        <td>{{ stats.persistent_water_ha }} ha</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Scientific Provenance & Audit Trail</h2>
+  <div class="provenance">
+    Bounding Box: {{ plan.aoi.bbox.as_list() }}<br>
+    Season Policy: {{ plan.season_policy }}<br>
+    Index: {{ plan.index }}<br>
+    Equal-Area Projection: {{ provenance.crs }}<br>
+    Software Version: v{{ software_version }}
+  </div>
+
+  <div class="footer">
+    Satellite Analyst • Reproducible, grounded remote sensing analysis • Licensed under MIT
+  </div>
+</body>
+</html>

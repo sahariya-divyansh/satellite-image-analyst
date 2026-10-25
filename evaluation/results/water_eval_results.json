@@ -1,0 +1,28 @@
+{
+  "regions": [
+    {
+      "region": "Raipur, CG",
+      "characteristic": "Inland Agricultural & Rivers",
+      "season": "Post-Monsoon",
+      "metrics": {
+        "status": "pending_phase_5_download"
+      }
+    },
+    {
+      "region": "Vembanad, KL",
+      "characteristic": "Coastal Backwaters & Wetlands",
+      "season": "Post-Monsoon",
+      "metrics": {
+        "status": "pending_phase_5_download"
+      }
+    },
+    {
+      "region": "Sambhar, RJ",
+      "characteristic": "Arid Saline Playa",
+      "season": "Post-Monsoon",
+      "metrics": {
+        "status": "pending_phase_5_download"
+      }
+    }
+  ]
+}
