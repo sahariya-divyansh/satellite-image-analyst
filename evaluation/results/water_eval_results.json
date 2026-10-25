@@ -1,28 +1,77 @@
 {
-  "regions": [
+  "status": "pending_manual_reference_downloads",
+  "methodology": {
+    "reference_dataset": "JRC Global Surface Water Monthly History v1.4",
+    "citation": "Pekel et al., Nature 540, 418-422 (2016)",
+    "validation_periods": "Post-Monsoon (Oct-Nov) for 2019, 2020, 2021",
+    "spatial_aggregation": "10m to 30m grid with 50% sub-pixel threshold",
+    "boundary_exclusion": "1-pixel transition band evaluated with and without",
+    "stratification": "Size categories (<1 ha, 1-10 ha, >10 ha)",
+    "uncertainty": "Block-bootstrap 95% confidence intervals (10x10 px blocks, B=500)",
+    "reporting_standard": "Reported as 'agreement with JRC GSW', never 'accuracy'"
+  },
+  "aois": [
     {
-      "region": "Raipur, CG",
-      "characteristic": "Inland Agricultural & Rivers",
-      "season": "Post-Monsoon",
-      "metrics": {
-        "status": "not_run"
+      "aoi_id": "raipur",
+      "aoi_name": "Raipur, Chhattisgarh",
+      "hydrological_regime": "Inland alluvial plains & agricultural dendritic drainage",
+      "has_reference_data": false,
+      "yearly_validation": {
+        "2019": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\raipur_jrc_monthly_2019.tif"
+        },
+        "2020": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\raipur_jrc_monthly_2020.tif"
+        },
+        "2021": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\raipur_jrc_monthly_2021.tif"
+        }
       }
     },
     {
-      "region": "Vembanad, KL",
-      "characteristic": "Coastal Backwaters & Wetlands",
-      "season": "Post-Monsoon",
-      "metrics": {
-        "status": "not_run"
+      "aoi_id": "bhopal",
+      "aoi_name": "Bhopal, Madhya Pradesh",
+      "hydrological_regime": "Lake-heavy urban & peri-urban plateau (Bhojtal / Halali)",
+      "has_reference_data": false,
+      "yearly_validation": {
+        "2019": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2019.tif"
+        },
+        "2020": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2020.tif"
+        },
+        "2021": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2021.tif"
+        }
       }
     },
     {
-      "region": "Sambhar, RJ",
-      "characteristic": "Arid Saline Playa",
-      "season": "Post-Monsoon",
-      "metrics": {
-        "status": "not_run"
+      "aoi_id": "jodhpur",
+      "aoi_name": "Jodhpur, Rajasthan",
+      "hydrological_regime": "Arid desert fringe with small ephemeral impoundments (Kaylana)",
+      "has_reference_data": false,
+      "yearly_validation": {
+        "2019": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\jodhpur_jrc_monthly_2019.tif"
+        },
+        "2020": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\jodhpur_jrc_monthly_2020.tif"
+        },
+        "2021": {
+          "status": "pending_reference_data",
+          "expected_path": "data\\reference\\jrc_gsw\\jodhpur_jrc_monthly_2021.tif"
+        }
       }
     }
-  ]
+  ],
+  "missing_files_count": 9,
+  "instructions": "JRC GSW Monthly History raw observations are distributed via Google Earth Engine asset collection 'JRC/GSW1_4/MonthlyHistory'. To execute full raster validation, export the October-November composite for each AOI and place the GeoTIFFs at:\n  - data\\reference\\jrc_gsw\\raipur_jrc_monthly_2019.tif\n  - data\\reference\\jrc_gsw\\raipur_jrc_monthly_2020.tif\n  - data\\reference\\jrc_gsw\\raipur_jrc_monthly_2021.tif\n  - data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2019.tif\n  - data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2020.tif\n  - data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2021.tif"
 }
