@@ -43,10 +43,14 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3.2"
 
-    # Geocoding
+    # Geocoding & Area Limits
     geocoding_user_agent: str = (
         "satellite-image-analyst/0.1.0 (contact: research@satellite-analyst.local)"
     )
+    max_aoi_area_km2: float = 2500.0
+
+    # STAC Query Limits
+    stac_max_cloud_cover: float = 40.0
 
     # Feature flags
     enable_experimental_clip_sam: bool = False

@@ -83,7 +83,8 @@ class RuleBasedPlanner:
                 place_name = "Raipur"  # Default canonical target
 
         # Geocode place name to bbox
-        bbox = self.geocoder.geocode(place_name)
+        geo_res = self.geocoder.geocode(place_name)
+        bbox = geo_res.bbox
 
         time_range_a = TimeInterval(
             start_date=date(year_a, start_month_day[0], start_month_day[1]),

@@ -32,6 +32,24 @@ class GeocodingError(SatelliteAnalystError):
         )
 
 
+class AOIAreaExceededError(SatelliteAnalystError):
+    """Raised when requested Area of Interest exceeds safety download bounds."""
+
+    def __init__(self, requested_area_km2: float, max_area_km2: float) -> None:
+        super().__init__(
+            message=(
+                f"Requested AOI area ({requested_area_km2:.1f} km²) exceeds maximum allowed "
+                f"threshold ({max_area_km2:.1f} km²). Reduce radius or specify a smaller region."
+            ),
+            code="AOI_AREA_EXCEEDED",
+            status_code=400,
+            details={
+                "requested_area_km2": requested_area_km2,
+                "max_area_km2": max_area_km2,
+            },
+        )
+
+
 class PlanGenerationError(SatelliteAnalystError):
     """Raised when natural-language query planning fails."""
 
