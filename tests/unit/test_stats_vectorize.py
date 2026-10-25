@@ -127,5 +127,66 @@ def test_compute_summary_stats() -> None:
     assert stats.total_water_period_b_ha == 3.00
     assert stats.net_change_ha == 0.50
     assert stats.percent_change == 20.00
+    assert stats.net_change_pct == 20.00
+    # churn_ratio = (1.0 + 0.5) / (2.0 + 1.0 + 0.5) = 1.5 / 3.5 = 0.4286 > 0.25 -> within noise
+    assert stats.churn_ratio == pytest.approx(0.4286, abs=1e-3)
+    assert stats.significance == "within noise / inconclusive"
     assert stats.waterbody_count == 1
     assert stats.valid_area_fraction == 1.00
+    # wb >= 1.0 ha
+    assert stats.headline_1ha["count"] == 1
+    assert stats.headline_1ha["total_water_period_a_ha"] == 2.50
+    assert stats.headline_1ha["total_water_period_b_ha"] == 3.00
+    assert stats.headline_1ha["net_change_ha"] == 0.50
+
+
+def test_significance_labels_expansion_and_noise() -> None:
+    """Test that significant expansion requires >= 10% change AND churn <= 0.25."""
+    shape = (100, 100)
+    # Significant expansion case: persistent = 20.0 ha (2000 px), gained = 3.0 ha (300 px), lost = 0.5 ha (50 px)
+    change_raster_exp = np.zeros(shape, dtype=np.uint8)
+    change_raster_exp[0:20, 0:100] = WaterChangeClass.PERSISTENT
+    change_raster_exp[20:23, 0:100] = WaterChangeClass.GAINED
+    change_raster_exp[23:24, 0:50] = WaterChangeClass.LOST
+
+    stats_exp = compute_summary_stats(change_raster_exp, waterbodies=[], pixel_size_m=10.0)
+    # net_change = 3.0 - 0.5 = 2.5 ha (12.5% of persistent)
+    # churn = 3.5 / 23.5 = 0.149 <= 0.25
+    assert stats_exp.significance == "significant expansion"
+
+    # Noise case: net change is large but churn is high (> 0.25)
+    change_raster_noise = np.zeros(shape, dtype=np.uint8)
+    change_raster_noise[0:10, 0:100] = WaterChangeClass.PERSISTENT  # 10.0 ha
+    change_raster_noise[10:14, 0:100] = WaterChangeClass.GAINED  # 4.0 ha
+    change_raster_noise[14:17, 0:100] = WaterChangeClass.LOST  # 3.0 ha
+    # net = +1.0 ha (10% of persistent), churn = 7.0 / 17.0 = 0.412 > 0.25
+    stats_noise = compute_summary_stats(change_raster_noise, waterbodies=[], pixel_size_m=10.0)
+    assert stats_noise.significance == "within noise / inconclusive"
+
+
+def test_threshold_sensitivity_evaluation() -> None:
+    from satellite_analyst.analysis.stats import compute_threshold_sensitivity
+
+    # 10x10 synthetic grid
+    mndwi_a = np.full((10, 10), -0.05, dtype=np.float32)
+    mndwi_b = np.full((10, 10), 0.05, dtype=np.float32)
+    valid_mask = np.ones((10, 10), dtype=bool)
+
+    # At threshold -0.1: both are water (net = 0)
+    # At threshold 0.0: a is dry, b is water (b gained 100 px = 1.0 ha, net = +1.0 ha)
+    # At threshold +0.1: both are dry (net = 0)
+    sens = compute_threshold_sensitivity(
+        mndwi_a=mndwi_a,
+        mndwi_b=mndwi_b,
+        valid_mask=valid_mask,
+        mid_threshold=0.0,
+        offset=0.1,
+        pixel_size_m=10.0,
+    )
+    assert sens.threshold_low == -0.1
+    assert sens.threshold_mid == 0.0
+    assert sens.threshold_high == 0.1
+    assert sens.net_change_low_ha == 0.0
+    assert sens.net_change_mid_ha == 1.0
+    assert sens.net_change_high_ha == 0.0
+    assert sens.sign_flips is False  # Min is 0.0, not negative

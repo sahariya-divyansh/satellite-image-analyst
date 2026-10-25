@@ -8,8 +8,10 @@ from satellite_analyst.analysis.change import (
 from satellite_analyst.analysis.indices import compute_mndwi, compute_ndwi
 from satellite_analyst.analysis.stats import (
     AreaSummaryStats,
+    ThresholdSensitivity,
     WaterBodyRecord,
     compute_summary_stats,
+    compute_threshold_sensitivity,
 )
 from satellite_analyst.analysis.vectorize import (
     estimate_utm_epsg,
@@ -42,5 +44,7 @@ __all__ = [
     "extract_waterbody_records",
     "WaterBodyRecord",
     "AreaSummaryStats",
+    "ThresholdSensitivity",
     "compute_summary_stats",
+    "compute_threshold_sensitivity",
 ]
