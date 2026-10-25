@@ -8,7 +8,6 @@ from satellite_analyst.planner.schema import (
     AnalysisPlan,
     AreaOfInterest,
     BoundingBox,
-    TimeInterval,
 )
 
 
@@ -38,15 +37,21 @@ def sample_analysis_plan(sample_bounding_box: BoundingBox) -> AnalysisPlan:
     """Fixture providing a standard water change plan."""
     from datetime import date
 
+    from satellite_analyst.planner.schema import PeriodPlan
+
     return AnalysisPlan(
         task_type="water_change",
-        aoi=AreaOfInterest(place_name="Raipur", bbox=sample_bounding_box),
-        time_range_a=TimeInterval(
+        aoi=AreaOfInterest(place="Raipur", bbox=sample_bounding_box),
+        period_a=PeriodPlan(
+            year=2023,
+            season="post_monsoon",
             start_date=date(2023, 10, 1),
             end_date=date(2023, 11, 30),
             label="Post-Monsoon Oct-Nov 2023",
         ),
-        time_range_b=TimeInterval(
+        period_b=PeriodPlan(
+            year=2025,
+            season="post_monsoon",
             start_date=date(2025, 10, 1),
             end_date=date(2025, 11, 30),
             label="Post-Monsoon Oct-Nov 2025",

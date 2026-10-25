@@ -7,7 +7,6 @@ from satellite_analyst.planner.schema import (
     AnalysisPlan,
     AreaOfInterest,
     BoundingBox,
-    TimeInterval,
 )
 
 
@@ -33,16 +32,59 @@ def test_valid_analysis_plan(sample_analysis_plan: AnalysisPlan) -> None:
 
 
 def test_water_change_requires_time_range_b(sample_bounding_box: BoundingBox) -> None:
-    from datetime import date
+    from satellite_analyst.planner.schema import PeriodPlan
 
     with pytest.raises(ValidationError, match="time_range_b is required"):
         AnalysisPlan(
             task_type="water_change",
-            aoi=AreaOfInterest(place_name="Raipur", bbox=sample_bounding_box),
-            time_range_a=TimeInterval(
-                start_date=date(2023, 10, 1),
-                end_date=date(2023, 11, 30),
-                label="Oct-Nov 2023",
-            ),
-            time_range_b=None,  # Invalid for water_change!
+            aoi=AreaOfInterest(place="Raipur", bbox=sample_bounding_box),
+            period_a=PeriodPlan(year=2023),
+            period_b=None,  # Invalid for water_change!
         )
+
+
+def test_query_plan_strict_validation() -> None:
+    from satellite_analyst.planner.schema import AOIPlan, PeriodPlan, QueryPlan
+
+    # Pre-2017 year rejected (Sentinel-2 L2A collection starts 2017)
+    with pytest.raises(ValidationError):
+        PeriodPlan(year=2015, season="post_monsoon")
+
+    # Radius > 28.2 km rejected (enforces 2500 km² ceiling)
+    with pytest.raises(ValidationError):
+        AOIPlan(place="Raipur", radius_km=30.0)
+
+    # Period B year <= Period A year rejected
+    with pytest.raises(ValidationError, match="period_b year.*must be strictly after"):
+        QueryPlan(
+            aoi=AOIPlan(place="Raipur", radius_km=15.0),
+            period_a=PeriodPlan(year=2024),
+            period_b=PeriodPlan(year=2023),
+        )
+
+    # Unknown fields rejected
+    with pytest.raises(ValidationError):
+        QueryPlan(
+            aoi=AOIPlan(place="Raipur"),
+            period_a=PeriodPlan(year=2023),
+            period_b=PeriodPlan(year=2025),
+            invalid_field=123,  # type: ignore[call-arg]
+        )
+
+    # needs_clarification requires clarification_question
+    with pytest.raises(ValidationError, match="clarification_question is required"):
+        QueryPlan(
+            needs_clarification=True,
+            clarification_question=None,
+            aoi=AOIPlan(place="Raipur"),
+            period_a=PeriodPlan(year=2023),
+        )
+
+    # out_of_scope automatically sets needs_clarification
+    plan_oos = QueryPlan(
+        task_type="out_of_scope",
+        aoi=AOIPlan(place="Unknown"),
+        period_a=PeriodPlan(year=2023),
+    )
+    assert plan_oos.needs_clarification is True
+    assert plan_oos.clarification_question is not None
