@@ -13,6 +13,14 @@ Sentinel-2 Level-2A products provide Bottom-of-Atmosphere (BOA) surface reflecta
   - Green (B03): 10m native
   - SWIR1 (B11): 20m native
   - *Preprocessing requirement*: SWIR1 must be resampled to 10m matching B03 using bilinear interpolation before index computation to avoid grid misalignment artifacts.
+- **Radiometric Calibration & Processing Baseline >= 04.00 (BOA_ADD_OFFSET)**:
+  - On 25 January 2022, ESA deployed processing baseline `04.00` for Sentinel-2 Level-2A products. This introduced an offset (`BOA_ADD_OFFSET = -1000` DN) to prevent truncation of negative surface reflectance values resulting from atmospheric correction.
+  - Formula for surface reflectance $\rho \in [0.0, 1.0]$:
+    $$\rho = \begin{cases}
+    \text{clip}\left(\frac{\text{DN} - 1000.0}{10000.0}, 0.0, 1.0\right) & \text{if Processing Baseline} \ge 04.00 \\
+    \text{clip}\left(\frac{\text{DN}}{10000.0}, 0.0, 1.0\right) & \text{if Processing Baseline} < 04.00
+    \end{cases}$$
+  - *Critical note*: Failure to account for the -1000 DN offset shifts SWIR1 and Green reflectances by up to $+0.10$, artificially suppressing MNDWI and leading to severe water omission false negatives. `satellite_analyst` parses per-scene baseline metadata to guarantee radiometrically sound index inputs.
 
 ## 2. Cloud and Shadow Masking (SCL)
 

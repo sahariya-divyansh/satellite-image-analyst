@@ -23,9 +23,9 @@
 |  | [~] Persistent Water (Blue)                |  | Task: Water Body Expansion         | |
 |  | [+] Water Expansion / Gain (Teal)          |  | Period A: Oct-Nov 2023             | |
 |  | [-] Water Retraction / Loss (Amber)        |  | Period B: Oct-Nov 2025             | |
-|  |                                            |  | Total Water (2023): 14,210.4 ha    | |
-|  |                                            |  | Total Water (2025): 16,845.2 ha    | |
-|  |                                            |  | Net Delta: +2,634.8 ha (+18.54%)   | |
+|  |                                            |  | Total Water (2023): [live stats]   | |
+|  |                                            |  | Total Water (2025): [live stats]   | |
+|  |                                            |  | Net Delta: [live stats]            | |
 |  |                                            |  | Sensor: Sentinel-2 L2A (SCL masked)| |
 |  +--------------------------------------------+  +------------------------------------+ |
 +-----------------------------------------------------------------------------------------+
@@ -100,9 +100,35 @@ make run
 
 Execute pipeline operations directly from your terminal:
 ```bash
-# Generate a cloud-masked seasonal composite for Raipur
-satellite-analyst composite --place Raipur --year 2023 --season post-monsoon
+# Generate a cloud-masked seasonal composite for Raipur (10m UTM EPSG:32644)
+satellite-analyst composite --place Raipur --year 2023 --season post-monsoon --radius-km 15
+```
 
+Terminal output:
+```text
+==> Resolving spatial bounds for 'Raipur' (radius: 15.0 km)...
+    Location: Raipur, Raipur Tahsil, Raipur, Chhattisgarh, 493332, India
+    Centroid: (21.2381, 81.6337) | Source: nominatim
+    BBox: [81.488701, 21.103045, 81.778962, 21.373004]
+    Planar Area: 900.0 km²
+==> Building Post-Monsoon Oct-Nov 2023 median composite (max cloud: 40.0%)...
+================ COMPOSITE SUMMARY ================
+ Place:                  Raipur
+ Seasonal Window:        Post-Monsoon Oct-Nov 2023
+ Scenes Found & Used:    33
+ Clear-Sky Valid Pixels: 100.00%
+ Equal-Area CRS:         EPSG:32644
+ Generated Artifacts:
+   [GREEN]: outputs/raipur_2023_post_monsoon_green.tif
+   [SWIR1]: outputs/raipur_2023_post_monsoon_swir1.tif
+   [VALID_COUNT]: outputs/raipur_2023_post_monsoon_valid_count.tif
+   [PROVENANCE]: outputs/raipur_2023_post_monsoon_provenance.json
+====================================================
+```
+
+![Raipur 2023 Composite Diagnostics](docs/images/raipur_2023_composite_quicklook.png)
+
+```bash
 # Run complete water change detection between 2023 and 2025
 satellite-analyst analyze --query "Show all water bodies that expanded near Raipur between 2023 and 2025"
 ```
@@ -136,12 +162,14 @@ All benchmark figures are reproducible and generated directly by running `make e
 
 ### 1. Planner Exact Match & Field Accuracy (Golden Query Suite, $N=42$)
 
+> **Benchmark Classification**: Development golden set, rule-based planner, not a held-out benchmark. Results indicate baseline rule heuristic conformance against designed queries. Live scores populated via `make evaluate`.
+
 | Provider | Model | Queries | Exact Match (%) | Task Type Acc (%) | Temporal Acc (%) | AOI Acc (%) |
 |---|---|---|---|---|---|---|
-| Rule-Based | Regex/Keyword Engine | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
-| Gemini | gemini-1.5-flash | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
-| OpenAI | gpt-4o-mini | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
-| Ollama | llama3.2 | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
+| Rule-Based | Regex/Keyword Engine | 42 | 85.71% | 90.48% | 90.48% | 85.71% |
+| Gemini | gemini-1.5-flash | 42 | *Run `make evaluate` with key* | *Pending key* | *Pending key* | *Pending key* |
+| OpenAI | gpt-4o-mini | 42 | *Run `make evaluate` with key* | *Pending key* | *Pending key* | *Pending key* |
+| Ollama | llama3.2 | 42 | *Run `make evaluate` with Ollama* | *Pending local* | *Pending local* | *Pending local* |
 
 ### 2. Water Mask Validation against JRC Global Surface Water
 
