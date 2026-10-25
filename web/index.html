@@ -13,10 +13,10 @@
 </head>
 <body>
   <div class="app-layout">
-    <!-- Top Header -->
+    <!-- Top Navigation Header -->
     <header class="top-nav">
       <div class="brand">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <circle cx="12" cy="12" r="9"/>
           <path d="M3.6 9h16.8M3.6 15h16.8"/>
           <path d="M11.5 3a17 17 0 0 0 0 18M12.5 3a17 17 0 0 1 0 18"/>
@@ -24,121 +24,183 @@
         <div>
           <span class="brand-title">Natural-Language Satellite Image Analyst</span>
           <span class="badge">Sentinel-2 L2A</span>
+          <span id="demo-indicator" class="badge badge-demo hidden">Cached Real Run</span>
         </div>
       </div>
       <div class="nav-links">
-        <a href="/docs" target="_blank" class="nav-item">API Docs</a>
+        <a href="/docs" target="_blank" class="nav-item">OpenAPI Docs</a>
+        <a href="/healthz" target="_blank" class="nav-item">Healthz</a>
         <a href="https://github.com/sahariya-divyansh/satellite-image-analyst" target="_blank" class="nav-item">GitHub</a>
       </div>
     </header>
 
     <!-- Main Workspace -->
     <div class="workspace">
-      <!-- Left Sidebar: Query, Controls, Report -->
-      <aside class="sidebar">
-        <!-- Query Section -->
+      <!-- Left Sidebar: Query, Controls, Results & Report -->
+      <aside class="sidebar" aria-label="Analysis Controls">
+        <!-- Query Input Card -->
         <section class="card query-card">
           <label for="query-input" class="card-title">Ask an Earth Observation Question</label>
           <div class="input-wrapper">
             <textarea id="query-input" rows="3" placeholder="e.g. Show all water bodies that expanded near Raipur between 2023 and 2025."></textarea>
-            <button id="submit-btn" class="btn btn-primary">
+            <button id="submit-btn" class="btn btn-primary" aria-label="Execute Analysis Pipeline">
               <span id="btn-text">Run Pipeline</span>
-              <div id="btn-spinner" class="spinner hidden"></div>
+              <div id="btn-spinner" class="spinner hidden" aria-hidden="true"></div>
             </button>
           </div>
 
           <div class="example-chips">
             <span class="chip-label">Examples:</span>
-            <button class="chip" data-query="Show all water bodies that expanded near Raipur between 2023 and 2025.">Raipur Water Expansion (2023-2025)</button>
-            <button class="chip" data-query="Analyze water body changes in Sambhar Salt Lake between 2022 and 2024 during pre-monsoon.">Sambhar Playa (Pre-Monsoon)</button>
-            <button class="chip" data-query="Detect surface water contraction near Vembanad between 2021 and 2024.">Vembanad Wetland Dynamics</button>
+            <div id="examples-container" class="chips-list">
+              <!-- Dynamically populated or default chips -->
+              <button class="chip" data-query="Show all water bodies that expanded near Raipur between 2023 and 2025">Raipur Water Expansion (2023-2025)</button>
+              <button class="chip" data-query="Analyze water body extent near Sambhar during pre-monsoon 2024">Sambhar Playa (Pre-Monsoon 2024)</button>
+              <button class="chip" data-query="Show water bodies that shrunk recently near Bhopal">Bhopal Lakes (Recent)</button>
+              <button class="chip" data-query="Show water body change near 21.15N, 79.08E from 2021 to 2024">Point Coordinate (21.15°N, 79.08°E)</button>
+            </div>
           </div>
+        </section>
+
+        <!-- Clarification Dialog Card (Displayed when query requires disambiguation) -->
+        <section id="clarification-card" class="card clarification-card hidden" role="alert">
+          <div class="clarification-header">
+            <span class="clarification-icon">ℹ️</span>
+            <h3 class="clarification-title">Clarification Required</h3>
+          </div>
+          <p id="clarification-text" class="clarification-text"></p>
+          <div id="clarification-assumptions" class="clarification-assumptions hidden">
+            <strong>Documented Assumptions:</strong>
+            <ul id="assumptions-list"></ul>
+          </div>
+          <button id="dismiss-clarification-btn" class="btn btn-secondary btn-sm">Refine Query</button>
         </section>
 
         <!-- Progress / Status Card -->
-        <section id="status-card" class="card status-card hidden">
+        <section id="status-card" class="card status-card hidden" aria-live="polite">
           <div class="status-header">
-            <span id="status-badge" class="badge badge-info">Initializing</span>
+            <span id="status-badge" class="badge badge-info">Queued</span>
             <span id="progress-percent" class="mono">0%</span>
           </div>
-          <div class="progress-bar-bg">
+          <div class="progress-bar-bg" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
             <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
           </div>
-          <p id="status-detail" class="status-detail">Translating intent into structured plan...</p>
+          <p id="status-detail" class="status-detail">Submitting query to API...</p>
         </section>
 
-        <!-- Statistics & Report Tabs -->
+        <!-- Analysis Results & Report Tabs -->
         <section id="results-card" class="card results-card hidden">
-          <div class="tab-header">
-            <button class="tab-btn active" data-tab="stats">Grounded Statistics</button>
-            <button class="tab-btn" data-tab="provenance">Provenance</button>
-            <button class="tab-btn" data-tab="report">Full Report</button>
+          <!-- Prominent Scientific Significance Badge (From API) -->
+          <div class="assessment-banner">
+            <span class="assessment-label">Scientific Assessment:</span>
+            <span id="significance-badge" class="significance-badge">EVALUATING</span>
           </div>
 
-          <div id="tab-stats" class="tab-content active">
+          <div class="tab-header" role="tablist">
+            <button class="tab-btn active" data-tab="stats" role="tab" aria-selected="true">Grounded Stats</button>
+            <button class="tab-btn" data-tab="plan" role="tab" aria-selected="false">Plan & Assumptions</button>
+            <button class="tab-btn" data-tab="report" role="tab" aria-selected="false">Scientific Report</button>
+          </div>
+
+          <!-- Stats Tab -->
+          <div id="tab-stats" class="tab-content active" role="tabpanel">
             <div class="stat-grid">
               <div class="stat-box">
                 <span class="stat-label">Net Surface Water Delta</span>
                 <span id="stat-net-change" class="stat-value text-accent">+0.0 ha</span>
               </div>
               <div class="stat-box">
-                <span class="stat-label">Relative Change</span>
+                <span class="stat-label">Percent Net Change</span>
                 <span id="stat-percent-change" class="stat-value">+0.0%</span>
               </div>
               <div class="stat-box">
                 <span class="stat-label">Persistent Water</span>
-                <span id="stat-persistent" class="stat-value text-blue">0.0 ha</span>
+                <span id="stat-persistent" class="stat-value text-cyan">0.0 ha</span>
               </div>
               <div class="stat-box">
-                <span class="stat-label">Gained Water</span>
-                <span id="stat-gained" class="stat-value text-teal">0.0 ha</span>
+                <span class="stat-label">Gained Water (Expansion)</span>
+                <span id="stat-gained" class="stat-value text-blue">0.0 ha</span>
               </div>
               <div class="stat-box">
-                <span class="stat-label">Lost Water</span>
-                <span id="stat-lost" class="stat-value text-amber">0.0 ha</span>
+                <span class="stat-label">Lost Water (Contraction)</span>
+                <span id="stat-lost" class="stat-value text-red">0.0 ha</span>
               </div>
               <div class="stat-box">
-                <span class="stat-label">Monitored Waterbodies</span>
+                <span class="stat-label">Observed Spatial Churn</span>
+                <span id="stat-churn" class="stat-value">0.0%</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Tracked Waterbodies (≥0.1 ha)</span>
                 <span id="stat-count" class="stat-value">0</span>
               </div>
+              <div class="stat-box">
+                <span class="stat-label">Headline Bodies (≥1.0 ha)</span>
+                <span id="stat-headline" class="stat-value">0 bodies</span>
+              </div>
+            </div>
+
+            <!-- Download Deliverables -->
+            <div class="downloads-section">
+              <span class="downloads-title">Export Deliverables:</span>
+              <div class="download-buttons">
+                <a id="btn-dl-geojson" class="btn btn-secondary btn-sm" href="#" download>GeoJSON</a>
+                <a id="btn-dl-csv" class="btn btn-secondary btn-sm" href="#" download>CSV</a>
+                <a id="btn-dl-report" class="btn btn-secondary btn-sm" href="#" download>Report (MD)</a>
+              </div>
             </div>
           </div>
 
-          <div id="tab-provenance" class="tab-content">
-            <div class="provenance-details mono" id="provenance-details">
-              Waiting for execution metadata...
+          <!-- Plan Tab -->
+          <div id="tab-plan" class="tab-content" role="tabpanel">
+            <div class="plan-details mono" id="plan-details">
+              Waiting for execution plan...
             </div>
           </div>
 
-          <div id="tab-report" class="tab-content">
-            <div id="report-view" class="report-view markdown-body">
-              No report available yet.
+          <!-- Full Scientific Report Tab -->
+          <div id="tab-report" class="tab-content" role="tabpanel">
+            <div class="report-frame-container">
+              <iframe id="report-iframe" class="report-iframe" sandbox="allow-same-origin" title="Scientific Earth Observation Report"></iframe>
             </div>
           </div>
         </section>
       </aside>
 
-      <!-- Center & Right: Interactive Map -->
-      <main class="map-container">
+      <!-- Center / Right: Interactive Leaflet Map -->
+      <main class="map-container" aria-label="Map Canvas">
         <div id="map"></div>
 
         <!-- Floating Map Legend & Layer Controls -->
         <div class="map-overlay legend-card">
-          <div class="legend-header">Map Layers</div>
-          <div class="layer-item">
-            <input type="checkbox" id="layer-persistent" checked>
-            <span class="legend-color legend-blue"></span>
-            <label for="layer-persistent">Persistent Water</label>
-          </div>
+          <div class="legend-header">Surface Water Layers</div>
           <div class="layer-item">
             <input type="checkbox" id="layer-gained" checked>
-            <span class="legend-color legend-teal"></span>
-            <label for="layer-gained">Water Expansion (Gain)</label>
+            <span class="legend-color legend-blue"></span>
+            <label for="layer-gained">Gained Water (Blue)</label>
           </div>
           <div class="layer-item">
             <input type="checkbox" id="layer-lost" checked>
-            <span class="legend-color legend-amber"></span>
-            <label for="layer-lost">Water Retraction (Loss)</label>
+            <span class="legend-color legend-red"></span>
+            <label for="layer-lost">Lost Water (Red)</label>
+          </div>
+          <div class="layer-item">
+            <input type="checkbox" id="layer-persistent" checked>
+            <span class="legend-color legend-cyan"></span>
+            <label for="layer-persistent">Persistent Water (Cyan)</label>
+          </div>
+
+          <!-- Opacity Slider -->
+          <div class="opacity-control">
+            <label for="layer-opacity" class="opacity-label">Layer Opacity: <span id="opacity-val">70%</span></label>
+            <input type="range" id="layer-opacity" min="10" max="100" value="70">
+          </div>
+
+          <!-- Basemap Selector -->
+          <div class="basemap-control">
+            <span class="opacity-label">Basemap:</span>
+            <div class="basemap-buttons">
+              <button id="btn-basemap-satellite" class="btn btn-xs active">Esri Satellite</button>
+              <button id="btn-basemap-osm" class="btn btn-xs">OpenStreetMap</button>
+            </div>
           </div>
         </div>
       </main>
