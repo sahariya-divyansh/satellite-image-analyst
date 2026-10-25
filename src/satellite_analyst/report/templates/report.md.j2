@@ -31,6 +31,8 @@
 
 {{ narrative }}
 
+> **Scientific Interpretation Note**: The 25% churn ratio and 10% persistent-area cutoffs are configurable heuristic defaults (`churn_ratio_threshold=0.25`, `persistent_area_significance_pct=10.0`), not universal scientific standards. While the observed net change direction is threshold-stable across perturbed MNDWI cuts, its magnitude falls within spatial churn noise; hence, no categorical expansion or shrinkage claim is asserted.
+
 ### Quantitative Area Summary
 
 | Metric | Baseline ({{ plan.period_a.year }}) | Comparison ({{ plan.period_b.year if plan.period_b else 'N/A' }}) | Net Difference |
@@ -69,7 +71,7 @@
 - **Threshold Range Tested**: [{{ provenance.threshold_sensitivity.threshold_low }}, {{ provenance.threshold_sensitivity.threshold_mid }}, {{ provenance.threshold_sensitivity.threshold_high }}]
 - **Net Change Range**: [{{ "+" if provenance.threshold_sensitivity.net_change_range_ha[0] > 0 else "" }}{{ provenance.threshold_sensitivity.net_change_range_ha[0] }} ha, {{ "+" if provenance.threshold_sensitivity.net_change_range_ha[1] > 0 else "" }}{{ provenance.threshold_sensitivity.net_change_range_ha[1] }} ha]
 - **Sign Stability**: {{ "Stable across thresholds" if not provenance.threshold_sensitivity.sign_flips else "SENSITIVE: Net change flips sign across perturbed thresholds" }}
-- **Diagnostic Evaluation**: {{ provenance.threshold_sensitivity.summary }}
+- **Diagnostic Evaluation**: Sign is threshold-stable, but magnitude is within churn level, so no categorical claim is asserted. {{ provenance.threshold_sensitivity.summary }}
 {% else %}
 - *Sensitivity evaluation not executed.*
 {% endif %}
@@ -94,6 +96,7 @@
 1. **Spatial Resolution (10m GSD)**: Water bodies smaller than {{ plan.min_area_ha }} hectares (~10 Sentinel-2 pixels) cannot be reliably resolved. Small agricultural farm ponds or narrow irrigation canals (<10m width) suffer sub-pixel mixed signal attenuation.
 2. **Turbidity and Spectral Variation**: Sediment-rich waters reflect in green/red bands, which may lower MNDWI values. Aquatic vegetation or algal blooms reflect strongly in NIR, which pure water indices classify as vegetation.
 3. **Attribution Neutrality**: This report presents verified surface water extent dynamics. Local fluctuations (such as irrigation inundation or riverbed sandbar shifts) are possible contributors (not verified) and must not be treated as confirmed causes without high-resolution field or aerial validation.
+4. **Inter-Annual Variability**: Inter-annual variability cannot be assessed from a single year pair. Multi-year trajectory monitoring is required to separate cyclical rainfall fluctuations from structural hydrological trends.
 
 ---
 
@@ -101,6 +104,7 @@
 
 - **Projected Coordinate Reference System**: `{{ provenance.crs }}`
 - **Analysis Extent (WGS84 Bounding Box)**: `{{ provenance.bbox }}`
+- **Vector Attributes**: `waterbody_id`, `status`, `area_period_a_ha`, `area_period_b_ha`, `net_change_ha`, `percent_change`, `geometry`
 - **Software**: `satellite-analyst` v{{ software_version }}
 - **Planner Used**: `{{ plan.planner_used if plan.planner_used else 'rule_based' }}`
 {% if plan.fallback_reason %}

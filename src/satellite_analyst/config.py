@@ -52,6 +52,20 @@ class Settings(BaseSettings):
     # STAC Query Limits
     stac_max_cloud_cover: float = 40.0
 
+    # Temporal and Scientific Thresholds
+    min_year: int = 2017
+    churn_ratio_threshold: float = 0.25
+    persistent_area_significance_pct: float = 10.0
+
+    # API & Job Execution System
+    demo_mode: bool = False
+    jobs_dir: Path = Field(default=Path("./outputs/jobs"))
+    max_concurrent_jobs: int = 2
+    job_queue_limit: int = 10
+    job_ttl_hours: int = 24
+    rate_limit_per_minute: int = 60
+    cors_origins: list[str] = ["*"]
+
     # Feature flags
     enable_experimental_clip_sam: bool = False
 

@@ -1,6 +1,7 @@
 """Geocoding service with rate limiting, retries, projected radius buffering, and offline fallback."""
 
 import json
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,7 +27,7 @@ class GeocodeResult:
     lon: float
     bbox: BoundingBox
     display_name: str
-    source: Literal["nominatim", "offline_gazetteer", "cache"]
+    source: Literal["nominatim", "offline_gazetteer", "cache", "coordinate_literal"]
     area_km2: float
 
 
@@ -133,6 +134,34 @@ class GeocodeService:
         normalized = place_name.strip().lower()
         if not normalized:
             raise GeocodingError(place=place_name, reason="Empty place name")
+
+        # 0. Check for explicit decimal coordinates in input (e.g. "21.15N, 79.08E" or "21.15, 79.08")
+        coord_match = re.search(
+            r"^\s*(-?\d{1,2}(?:\.\d+)?)\s*°?\s*([NSns])?[\s,]+(-?\d{1,3}(?:\.\d+)?)\s*°?\s*([EWew])?\s*$",
+            place_name.strip(),
+        )
+        if coord_match:
+            c_lat = float(coord_match.group(1))
+            if coord_match.group(2) and coord_match.group(2).upper() == "S":
+                c_lat = -abs(c_lat)
+            c_lon = float(coord_match.group(3))
+            if coord_match.group(4) and coord_match.group(4).upper() == "W":
+                c_lon = -abs(c_lon)
+            if -90.0 <= c_lat <= 90.0 and -180.0 <= c_lon <= 180.0:
+                rad = radius_km or 15.0
+                c_bbox = buffer_point_to_bbox(c_lat, c_lon, rad)
+                c_area = compute_bbox_area_km2(c_bbox)
+                if c_area > self.max_area_km2:
+                    raise AOIAreaExceededError(c_area, self.max_area_km2)
+                return GeocodeResult(
+                    name=place_name.strip(),
+                    lat=c_lat,
+                    lon=c_lon,
+                    bbox=c_bbox,
+                    display_name=f"Point Coordinate ({c_lat:.4f}, {c_lon:.4f})",
+                    source="coordinate_literal",
+                    area_km2=c_area,
+                )
 
         cache_key = f"{normalized}__radius_{radius_km}" if radius_km else normalized
 

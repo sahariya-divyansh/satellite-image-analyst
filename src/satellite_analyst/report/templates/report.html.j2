@@ -94,13 +94,14 @@
     Tested Thresholds: [{{ provenance.threshold_sensitivity.threshold_low }}, {{ provenance.threshold_sensitivity.threshold_mid }}, {{ provenance.threshold_sensitivity.threshold_high }}]<br>
     Net Change Range: [{{ "+" if provenance.threshold_sensitivity.net_change_range_ha[0] > 0 else "" }}{{ provenance.threshold_sensitivity.net_change_range_ha[0] }} ha, {{ "+" if provenance.threshold_sensitivity.net_change_range_ha[1] > 0 else "" }}{{ provenance.threshold_sensitivity.net_change_range_ha[1] }} ha]<br>
     Sign Stability: {{ "Stable across thresholds" if not provenance.threshold_sensitivity.sign_flips else "SENSITIVE: Net change flips sign across perturbed thresholds" }}<br>
-    <em>{{ provenance.threshold_sensitivity.summary }}</em>
+    <em>Sign is threshold-stable, but magnitude is within churn level, so no categorical claim is asserted. {{ provenance.threshold_sensitivity.summary }}</em>
   </div>
   {% endif %}
 
   <div class="provenance">
     Target AOI Bounding Box (WGS84): {{ provenance.bbox }}<br>
     Equal-Area Projection: {{ provenance.crs }} (10m GSD)<br>
+    Vector Attributes: <code>waterbody_id</code>, <code>status</code>, <code>area_period_a_ha</code>, <code>area_period_b_ha</code>, <code>net_change_ha</code>, <code>percent_change</code>, <code>geometry</code><br>
     Spectral Index: Modified Normalized Difference Water Index (MNDWI)<br>
     Thresholds: Baseline = {{ provenance.period_a.threshold }}, Comparison = {{ provenance.period_b.threshold if provenance.period_b else 'N/A' }}<br>
     Scene Counts: Baseline = {{ provenance.period_a.scenes_count }}, Comparison = {{ provenance.period_b.scenes_count if provenance.period_b else 'N/A' }}<br>
@@ -112,7 +113,9 @@
   <div class="caveats">
     <strong>Scientific Caveats:</strong><br>
     1. Water bodies &lt; 0.1 ha (~10 Sentinel-2 pixels) are filtered out to suppress sub-pixel mixed edge noise.<br>
-    2. Localized boundary changes along riverbanks or canals are possible contributors (not verified) and must not be cited as confirmed causes without field validation.
+    2. Localized boundary changes along riverbanks or canals are possible contributors (not verified) and must not be cited as confirmed causes without field validation.<br>
+    3. The 25% churn and 10% persistent-area cutoffs are configurable heuristic defaults, not universal physical laws.<br>
+    4. Inter-annual variability cannot be assessed from a single year pair; multi-year monitoring is recommended.
   </div>
 
   <div class="footer">

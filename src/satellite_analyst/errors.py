@@ -118,3 +118,39 @@ class JobNotFoundError(SatelliteAnalystError):
             status_code=404,
             details={"job_id": job_id},
         )
+
+
+class RateLimitExceededError(SatelliteAnalystError):
+    """Raised when client IP exceeds rate limit."""
+
+    def __init__(self, limit_per_minute: int) -> None:
+        super().__init__(
+            message=f"Too many requests. Rate limit is {limit_per_minute} requests per minute.",
+            code="RATE_LIMIT_EXCEEDED",
+            status_code=429,
+            details={"limit_per_minute": limit_per_minute},
+        )
+
+
+class QueueLimitExceededError(SatelliteAnalystError):
+    """Raised when the job execution queue is full."""
+
+    def __init__(self, queue_limit: int) -> None:
+        super().__init__(
+            message=f"Server job queue is at capacity ({queue_limit} jobs). Please try again shortly.",
+            code="QUEUE_LIMIT_EXCEEDED",
+            status_code=503,
+            details={"queue_limit": queue_limit},
+        )
+
+
+class InvalidLayerError(SatelliteAnalystError):
+    """Raised when an invalid or unwhitelisted layer name is requested."""
+
+    def __init__(self, layer_name: str, allowed: list[str]) -> None:
+        super().__init__(
+            message=f"Invalid layer '{layer_name}'. Allowed layers are: {', '.join(allowed)}.",
+            code="INVALID_LAYER",
+            status_code=400,
+            details={"requested_layer": layer_name, "allowed_layers": allowed},
+        )
