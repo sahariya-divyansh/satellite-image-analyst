@@ -1,0 +1,256 @@
+{
+  "aoi": "Raipur, Chhattisgarh",
+  "bbox": [
+    81.48870071871478,
+    21.103045223154265,
+    81.77896206081788,
+    21.373003559733245
+  ],
+  "years": [
+    {
+      "year": 2018,
+      "scene_count": 23,
+      "valid_fraction": 1.0,
+      "valid_obs_min": 0,
+      "valid_obs_median": 12.0,
+      "valid_obs_max": 23,
+      "total_water_ha": 1543.39,
+      "waterbody_count": 1104,
+      "headline_1ha_water_ha": 1192.85,
+      "headline_1ha_count": 342,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1538.15,
+        "std_ha": 19.84,
+        "min_ha": 1500.35,
+        "max_ha": 1585.37,
+        "spread_ha": 85.02
+      },
+      "land_reflectance": {
+        "median_green": 0.0851,
+        "median_swir1": 0.1942,
+        "median_mndwi": -0.3908
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.5081,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2019,
+      "scene_count": 17,
+      "valid_fraction": 0.9999,
+      "valid_obs_min": 0,
+      "valid_obs_median": 7.0,
+      "valid_obs_max": 17,
+      "total_water_ha": 2500.39,
+      "waterbody_count": 1498,
+      "headline_1ha_water_ha": 2059.66,
+      "headline_1ha_count": 524,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 2498.2,
+        "std_ha": 30.07,
+        "min_ha": 2457.73,
+        "max_ha": 2561.19,
+        "spread_ha": 103.46
+      },
+      "land_reflectance": {
+        "median_green": 0.0974,
+        "median_swir1": 0.1858,
+        "median_mndwi": -0.3098
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.5446,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2020,
+      "scene_count": 17,
+      "valid_fraction": 1.0,
+      "valid_obs_min": 0,
+      "valid_obs_median": 8.0,
+      "valid_obs_max": 17,
+      "total_water_ha": 1476.28,
+      "waterbody_count": 1079,
+      "headline_1ha_water_ha": 1138.42,
+      "headline_1ha_count": 318,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1480.82,
+        "std_ha": 23.46,
+        "min_ha": 1437.3,
+        "max_ha": 1542.25,
+        "spread_ha": 104.95
+      },
+      "land_reflectance": {
+        "median_green": 0.0819,
+        "median_swir1": 0.2038,
+        "median_mndwi": -0.4287
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.5191,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2021,
+      "scene_count": 10,
+      "valid_fraction": 0.9994,
+      "valid_obs_min": 0,
+      "valid_obs_median": 5.0,
+      "valid_obs_max": 10,
+      "total_water_ha": 1749.25,
+      "waterbody_count": 1285,
+      "headline_1ha_water_ha": 1361.52,
+      "headline_1ha_count": 414,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1740.12,
+        "std_ha": 21.92,
+        "min_ha": 1680.47,
+        "max_ha": 1777.48,
+        "spread_ha": 97.01
+      },
+      "land_reflectance": {
+        "median_green": 0.0904,
+        "median_swir1": 0.1967,
+        "median_mndwi": -0.3731
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.5181,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2022,
+      "scene_count": 23,
+      "valid_fraction": 1.0,
+      "valid_obs_min": 6,
+      "valid_obs_median": 8.0,
+      "valid_obs_max": 16,
+      "total_water_ha": 1455.69,
+      "waterbody_count": 1091,
+      "headline_1ha_water_ha": 1114.37,
+      "headline_1ha_count": 315,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1451.7,
+        "std_ha": 30.73,
+        "min_ha": 1391.69,
+        "max_ha": 1514.13,
+        "spread_ha": 122.44
+      },
+      "land_reflectance": {
+        "median_green": 0.0708,
+        "median_swir1": 0.1849,
+        "median_mndwi": -0.4401
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.4979,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2023,
+      "scene_count": 33,
+      "valid_fraction": 1.0,
+      "valid_obs_min": 6,
+      "valid_obs_median": 10.0,
+      "valid_obs_max": 23,
+      "total_water_ha": 1674.99,
+      "waterbody_count": 1235,
+      "headline_1ha_water_ha": 1285.26,
+      "headline_1ha_count": 354,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1673.03,
+        "std_ha": 21.74,
+        "min_ha": 1635.33,
+        "max_ha": 1710.29,
+        "spread_ha": 74.96
+      },
+      "land_reflectance": {
+        "median_green": 0.0792,
+        "median_swir1": 0.1824,
+        "median_mndwi": -0.3856
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.4908,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2024,
+      "scene_count": 17,
+      "valid_fraction": 1.0,
+      "valid_obs_min": 3,
+      "valid_obs_median": 8.0,
+      "valid_obs_max": 17,
+      "total_water_ha": 1477.26,
+      "waterbody_count": 1022,
+      "headline_1ha_water_ha": 1159.1,
+      "headline_1ha_count": 305,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1480.27,
+        "std_ha": 23.15,
+        "min_ha": 1446.4,
+        "max_ha": 1517.37,
+        "spread_ha": 70.97
+      },
+      "land_reflectance": {
+        "median_green": 0.0839,
+        "median_swir1": 0.2036,
+        "median_mndwi": -0.4149
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.5094,
+        "is_bimodal": false
+      }
+    },
+    {
+      "year": 2025,
+      "scene_count": 22,
+      "valid_fraction": 1.0,
+      "valid_obs_min": 6,
+      "valid_obs_median": 10.0,
+      "valid_obs_max": 22,
+      "total_water_ha": 1721.65,
+      "waterbody_count": 1210,
+      "headline_1ha_water_ha": 1345.64,
+      "headline_1ha_count": 371,
+      "subsampling_10scenes": {
+        "repetitions": 20,
+        "mean_ha": 1718.23,
+        "std_ha": 31.1,
+        "min_ha": 1658.59,
+        "max_ha": 1797.47,
+        "spread_ha": 138.88
+      },
+      "land_reflectance": {
+        "median_green": 0.0834,
+        "median_swir1": 0.194,
+        "median_mndwi": -0.3967
+      },
+      "otsu_diagnostics": {
+        "eta_ratio": 0.5069,
+        "is_bimodal": false
+      }
+    }
+  ],
+  "synthesis": {
+    "mean_water_area_ha": 1699.86,
+    "std_water_area_ha": 321.72,
+    "min_water_area_ha": 1455.69,
+    "max_water_area_ha": 2500.39,
+    "range_water_area_ha": 1044.7,
+    "mean_absolute_annual_step_ha": 458.44,
+    "average_subsampling_spread_ha": 99.71,
+    "observed_2023_2025_delta_ha": 46.66,
+    "observed_2023_2025_pct": 2.79,
+    "is_within_cyclical_noise": true,
+    "scientific_conclusion": "The observed 2023->2025 net surface water increase of +46.66 ha (+2.79%) is substantially smaller than the historical mean year-to-year step (458.44 ha) and within the range of multi-year cyclical fluctuations (std = 321.72 ha). Therefore, categorizing this shift as structural expansion would be scientifically indefensible; it is properly classified as 'within noise / inconclusive'."
+  }
+}
