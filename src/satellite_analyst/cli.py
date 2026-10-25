@@ -1,10 +1,11 @@
 """Command Line Interface for satellite-analyst."""
 
 import json
+import os
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import click
 import pandas as pd  # type: ignore[import-untyped]
@@ -13,7 +14,10 @@ from affine import Affine
 from satellite_analyst import __version__
 from satellite_analyst.analysis.change import detect_water_change, save_change_raster_to_geotiff
 from satellite_analyst.analysis.indices import compute_mndwi
-from satellite_analyst.analysis.stats import compute_summary_stats
+from satellite_analyst.analysis.stats import (
+    compute_summary_stats,
+    compute_threshold_sensitivity,
+)
 from satellite_analyst.analysis.vectorize import (
     estimate_utm_epsg,
     extract_waterbody_records,
@@ -24,8 +28,12 @@ from satellite_analyst.data.composites import CompositeBuilder, save_composite_t
 from satellite_analyst.errors import SatelliteAnalystError
 from satellite_analyst.logging import setup_logging
 from satellite_analyst.planner.geocode import GeocodeService
+from satellite_analyst.planner.llm_base import BaseLLMProvider, LLMPlanner
+from satellite_analyst.planner.providers.gemini import GeminiProvider
+from satellite_analyst.planner.providers.openai import OpenAIProvider
 from satellite_analyst.planner.rule_based import RuleBasedPlanner
 from satellite_analyst.planner.schema import TimeInterval
+from satellite_analyst.report.generator import ReportGenerator
 
 
 @click.group()
@@ -305,10 +313,20 @@ def water_change(
             pixel_size_m=10.0,
         )
 
-        # 9. Compute regional aggregate statistics
+        # 9. Compute regional aggregate statistics and sensitivity
         stats = compute_summary_stats(
             change_raster=change_raster,
             waterbodies=wb_records,
+            pixel_size_m=10.0,
+        )
+
+        valid_common = (comp_a.valid_count.values >= 2) & (comp_b.valid_count.values >= 2)
+        sensitivity = compute_threshold_sensitivity(
+            mndwi_a=mndwi_a,
+            mndwi_b=mndwi_b,
+            valid_mask=valid_common,
+            mid_threshold=float(mask_a.threshold),
+            offset=0.1,
             pixel_size_m=10.0,
         )
 
@@ -354,6 +372,7 @@ def water_change(
                 "bimodality_metric": round(mask_b.bimodality_metric, 4),
             },
             "summary_statistics": stats.to_dict(),
+            "threshold_sensitivity": sensitivity.to_dict(),
             "software_version": __version__,
             "timestamp": datetime.now(UTC).isoformat(),
         }
@@ -389,7 +408,18 @@ def water_change(
         click.echo(f"   Gained Water (New):          {stats.gained_water_ha:>10,.2f} ha")
         click.echo(f"   Lost Water (Receded):        {stats.lost_water_ha:>10,.2f} ha")
         click.echo(f"   Persistent Water (Stable):   {stats.persistent_water_ha:>10,.2f} ha")
-        click.echo(f"   Tracked Waterbodies:         {stats.waterbody_count:>10} features")
+        click.echo(f"   Churn Ratio:                 {stats.churn_ratio * 100:>10.2f}%")
+        click.echo(f"   Scientific Significance:     {stats.significance.upper():>10}")
+        click.echo(" Headline Features (>= 1.0 ha):")
+        click.echo(
+            f"   Count: {stats.headline_1ha['count']} | Period A: {stats.headline_1ha['total_water_period_a_ha']:.2f} ha | Period B: {stats.headline_1ha['total_water_period_b_ha']:.2f} ha | Net: {stats.headline_1ha['net_change_ha']:+.2f} ha"
+        )
+        click.echo(" Threshold Sensitivity (+-0.1 MNDWI):")
+        click.echo(
+            f"   Range: [{sensitivity.net_change_range_ha[0]:+.2f}, {sensitivity.net_change_range_ha[1]:+.2f}] ha | Sign Flips: {sensitivity.sign_flips} | Stable: {sensitivity.is_stable}"
+        )
+        click.echo("----------------------------------------------------------------------------")
+        click.echo(f"   Tracked Waterbodies (All):   {stats.waterbody_count:>10} features")
         click.echo(f"   Valid AOI Area Fraction:     {stats.valid_area_fraction * 100:>10.2f}%")
         click.echo("----------------------------------------------------------------------------")
         click.echo(" Exported Artifacts:")
@@ -410,20 +440,280 @@ def water_change(
 
 @main.command()
 @click.option("--query", required=True, help="Natural language query string.")
-def analyze(query: str) -> None:
-    """Execute end-to-end analysis from a natural language query."""
+@click.option(
+    "--planner",
+    type=click.Choice(["rule", "llm", "auto"]),
+    default="auto",
+    help="Planner engine ('rule', 'llm', or 'auto' detection).",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Emit the validated JSON execution plan only and exit.",
+)
+@click.option(
+    "--out",
+    type=click.Path(path_type=Path),
+    default=Path("outputs/"),
+    help="Directory to save generated outputs and scientific report.",
+)
+def analyze(query: str, planner: str, dry_run: bool, out: Path) -> None:
+    """Execute end-to-end surface water analysis from a natural language query."""
     try:
-        click.echo(f"Executing query: '{query}'")
-        planner = RuleBasedPlanner()
-        plan = planner.parse_query(query)
+        out.mkdir(parents=True, exist_ok=True)
+        click.echo(f"==> Interpreting query: '{query}'")
+
+        # 1. Resolve planner provider
+        llm_provider: BaseLLMProvider | None = None
+        if planner in ("llm", "auto"):
+            if os.environ.get("GEMINI_API_KEY"):
+                llm_provider = GeminiProvider()
+            elif os.environ.get("OPENAI_API_KEY"):
+                llm_provider = OpenAIProvider()
+            elif planner == "llm":
+                click.secho(
+                    "Warning: --planner llm requested but no API key configured. Falling back to rule-based.",
+                    fg="yellow",
+                )
+
+        if planner == "rule" or (planner == "auto" and llm_provider is None):
+            plan_engine: Any = RuleBasedPlanner()
+            plan = plan_engine.parse_query(query)
+        else:
+            plan_engine = LLMPlanner(provider=llm_provider, fallback_planner=RuleBasedPlanner())
+            plan = plan_engine.parse_query(query)
+
+        # 2. Check for clarification requirement
+        if plan.needs_clarification:
+            click.secho(
+                f"\nClarification Required: {plan.clarification_question}\n",
+                fg="yellow",
+                err=True,
+            )
+            sys.exit(2)
+
+        # 3. Dry-run mode: output validated plan JSON and exit
+        if dry_run:
+            click.echo("\n================ VALIDATED EXECUTION PLAN ================")
+            click.echo(plan.model_dump_json(indent=2))
+            click.echo("==========================================================\n")
+            return
+
         click.echo(
-            f"Generated Plan: {plan.task_type} for {plan.aoi.place_name} ({plan.season_policy})"
+            f"==> Generated Plan: {plan.task_type} for {plan.aoi.place} ({plan.season_policy})"
         )
-        click.echo(f"Baseline window: {plan.time_range_a.label}")
+        click.echo(f"    Baseline period:   {plan.time_range_a.label}")
         if plan.time_range_b:
-            click.echo(f"Comparison window: {plan.time_range_b.label}")
+            click.echo(f"    Comparison period: {plan.time_range_b.label}")
+        if plan.assumptions:
+            click.echo(f"    Assumptions applied: {len(plan.assumptions)}")
+            for asm in plan.assumptions:
+                click.echo(f"      - {asm}")
+
+        # 4. Geocode target spatial bounds
+        geocoder = GeocodeService()
+        geo_res = geocoder.geocode(plan.aoi.place, radius_km=plan.aoi.radius_km)
+
+        # 5. Build composites
+        builder = CompositeBuilder()
+        interval_a = plan.time_range_a
+        label_a = interval_a.label
+        click.echo(f"==> Ingesting / loading Baseline Composite ({label_a})...")
+        comp_a = builder.build_composite(
+            bbox=geo_res.bbox,
+            time_range=interval_a,
+            max_cloud_cover=40.0,
+            min_valid_obs=2,
+        )
+
+        year_b = plan.period_b.year if plan.period_b else plan.period_a.year + 2
+        label_b = plan.time_range_b.label if plan.time_range_b else f"Period B {year_b}"
+        interval_b = (
+            plan.time_range_b
+            if plan.time_range_b
+            else TimeInterval(
+                start_date=date(year_b, 10, 1),
+                end_date=date(year_b, 11, 30),
+                label=label_b,
+            )
+        )
+        click.echo(f"==> Ingesting / loading Comparison Composite ({label_b})...")
+        comp_b = builder.build_composite(
+            bbox=geo_res.bbox,
+            time_range=interval_b,
+            max_cloud_cover=40.0,
+            min_valid_obs=2,
+        )
+
+        # 6. Compute spectral indices
+        click.echo("==> Computing Modified Normalized Difference Water Index (MNDWI)...")
+        mndwi_a = compute_mndwi(comp_a.green.values, comp_a.swir1.values)
+        mndwi_b = compute_mndwi(comp_b.green.values, comp_b.swir1.values)
+
+        # 7. Segment water masks
+        click.echo("==> Segmenting surface water masks...")
+        policy_lit: Literal["shared", "per_period"] = "shared"
+        mask_a, mask_b = segment_dual_period_water(
+            mndwi_a=mndwi_a,
+            mndwi_b=mndwi_b,
+            policy=policy_lit,
+            min_area_ha=plan.min_area_ha,
+            pixel_size_m=10.0,
+        )
+
+        # 8. Detect change raster and vectorize
+        click.echo("==> Classifying 3-class surface water dynamics...")
+        change_raster = detect_water_change(
+            mask_a=mask_a,
+            mask_b=mask_b,
+            valid_count_a=comp_a.valid_count.values,
+            valid_count_b=comp_b.valid_count.values,
+            min_valid_obs=2,
+        )
+
+        # Derive Affine Transform from coordinate dimensions
+        xs = comp_a.green["x"].values
+        ys = comp_a.green["y"].values
+        res_x = float(abs(xs[1] - xs[0])) if len(xs) > 1 else 10.0
+        res_y = float(abs(ys[1] - ys[0])) if len(ys) > 1 else 10.0
+        top_left_x = float(xs[0] - res_x / 2.0)
+        top_left_y = float(ys[0] + res_y / 2.0)
+        transform = Affine.translation(top_left_x, top_left_y) @ Affine.scale(res_x, -res_y)
+
+        change_gdf = vectorize_change_classes(
+            change_raster,
+            transform=transform,
+            crs=comp_a.crs,
+            min_area_ha=plan.min_area_ha,
+        )
+        wb_records, wb_gdf = extract_waterbody_records(
+            mask_a=mask_a.mask,
+            mask_b=mask_b.mask,
+            transform=transform,
+            crs=comp_a.crs,
+            min_area_ha=plan.min_area_ha,
+            pixel_size_m=10.0,
+        )
+
+        # 9. Compute summary stats & threshold sensitivity
+        stats = compute_summary_stats(
+            change_raster=change_raster,
+            waterbodies=wb_records,
+            pixel_size_m=10.0,
+        )
+        valid_common = (comp_a.valid_count.values >= 2) & (comp_b.valid_count.values >= 2)
+        sensitivity = compute_threshold_sensitivity(
+            mndwi_a=mndwi_a,
+            mndwi_b=mndwi_b,
+            valid_mask=valid_common,
+            mid_threshold=float(mask_a.threshold),
+            offset=0.1,
+            pixel_size_m=10.0,
+        )
+
+        # 10. Export geospatial artifacts
+        slug = f"{plan.aoi.place.lower().replace(' ', '_')}_{plan.period_a.year}_{year_b}_{plan.season_policy}"
+        p_change_tif = out / f"{slug}_change_classes.tif"
+        p_change_geojson = out / f"{slug}_change_vectors.geojson"
+        p_wb_geojson = out / f"{slug}_waterbodies.geojson"
+        p_wb_csv = out / f"{slug}_waterbodies.csv"
+        p_provenance = out / f"{slug}_provenance.json"
+        p_report_md = out / f"{slug}_report.md"
+        p_report_html = out / f"{slug}_report.html"
+
+        save_change_raster_to_geotiff(change_raster, p_change_tif, transform, comp_a.crs)
+        change_gdf.to_file(p_change_geojson, driver="GeoJSON")
+        wb_gdf.to_file(p_wb_geojson, driver="GeoJSON")
+        pd.DataFrame([r.to_dict() for r in wb_records]).to_csv(p_wb_csv, index=False)
+
+        prov_meta = {
+            "query": query,
+            "place": plan.aoi.place,
+            "centroid": [geo_res.lat, geo_res.lon],
+            "radius_km": plan.aoi.radius_km,
+            "bbox": geo_res.bbox.as_list(),
+            "crs": comp_a.crs,
+            "year_a": plan.period_a.year,
+            "year_b": year_b,
+            "season": plan.season_policy,
+            "threshold_policy": plan.season_policy,
+            "period_a": {
+                "window": label_a,
+                "scenes_count": len(comp_a.scene_ids),
+                "threshold": round(mask_a.threshold, 4),
+                "method": mask_a.method,
+                "water_fraction": round(mask_a.water_fraction, 4),
+                "bimodality_metric": round(mask_a.bimodality_metric, 4),
+            },
+            "period_b": {
+                "window": label_b,
+                "scenes_count": len(comp_b.scene_ids),
+                "threshold": round(mask_b.threshold, 4),
+                "method": mask_b.method,
+                "water_fraction": round(mask_b.water_fraction, 4),
+                "bimodality_metric": round(mask_b.bimodality_metric, 4),
+            },
+            "summary_statistics": stats.to_dict(),
+            "threshold_sensitivity": sensitivity.to_dict(),
+            "software_version": __version__,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+        with open(p_provenance, "w", encoding="utf-8") as f:
+            json.dump(prov_meta, f, indent=2)
+
+        # 11. Generate grounded scientific report
+        click.echo("==> Synthesizing grounded report...")
+        report_gen = ReportGenerator()
+        narrative, md_report, html_report = report_gen.generate_report_bundle(
+            plan=plan,
+            stats=stats.to_dict(),
+            provenance=prov_meta,
+            provider=llm_provider,
+            user_query=query,
+        )
+        p_report_md.write_text(md_report, encoding="utf-8")
+        p_report_html.write_text(html_report, encoding="utf-8")
+
+        # 12. Print terminal summary
+        delta_sign = "+" if stats.net_change_ha >= 0 else ""
+        click.echo("\n====================== SATELLITE ANALYST REPORT ======================")
+        click.echo(f" Target Location:        {plan.aoi.place} (Radius: {plan.aoi.radius_km} km)")
+        click.echo(f" Analysis Period:        {label_a} vs {label_b}")
+        click.echo(
+            f" Scientific Assessment:  {stats.significance.upper()} (Churn: {stats.churn_ratio * 100:.2f}%)"
+        )
+        click.echo("----------------------------------------------------------------------")
+        click.echo(f" Baseline Water:         {stats.total_water_period_a_ha:>10,.2f} ha")
+        click.echo(f" Comparison Water:       {stats.total_water_period_b_ha:>10,.2f} ha")
+        click.echo(
+            f" Net Change:         {delta_sign}{stats.net_change_ha:>9,.2f} ha ({delta_sign}{stats.percent_change:.2f}%)"
+        )
+        click.echo(f" Gained Surface Water:   {stats.gained_water_ha:>10,.2f} ha")
+        click.echo(f" Lost Surface Water:     {stats.lost_water_ha:>10,.2f} ha")
+        click.echo(f" Persistent Water:       {stats.persistent_water_ha:>10,.2f} ha")
+        click.echo(
+            f" Headline Bodies (>=1ha): {stats.headline_1ha['count']} bodies (Net: {stats.headline_1ha['net_change_ha']:+.2f} ha)"
+        )
+        click.echo(
+            f" Sensitivity Range:      [{sensitivity.net_change_range_ha[0]:+.2f}, {sensitivity.net_change_range_ha[1]:+.2f}] ha (Sign flips: {sensitivity.sign_flips})"
+        )
+        click.echo("----------------------------------------------------------------------")
+        click.echo(f" Generated Narrative:\n {narrative}")
+        click.echo("----------------------------------------------------------------------")
+        click.echo(" Exported Artifacts:")
+        click.echo(f"   [MARKDOWN REPORT]:  {p_report_md}")
+        click.echo(f"   [HTML REPORT]:      {p_report_html}")
+        click.echo(f"   [PROVENANCE JSON]:  {p_provenance}")
+        click.echo(f"   [VECTOR CLASSES]:   {p_change_geojson}")
+        click.echo(f"   [WATERBODIES]:      {p_wb_geojson}")
+        click.echo(f"   [CHANGE RASTER]:    {p_change_tif}")
+        click.echo("======================================================================\n")
+
+    except SatelliteAnalystError as sae:
+        click.secho(f"\nError: [{sae.code}] {sae.message}", fg="red", err=True)
+        sys.exit(1)
     except Exception as e:
-        click.secho(f"Analysis failed: {e}", fg="red", err=True)
+        click.secho(f"\nExecution Failed: {e}", fg="red", err=True)
         sys.exit(1)
 
 
