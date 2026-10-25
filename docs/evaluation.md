@@ -29,14 +29,14 @@ A golden benchmark set of 42 diverse natural-language queries (`evaluation/golde
 
 ### Benchmark Results
 
-*(Execute `make evaluate` to execute golden query suite and populate live metrics)*
+> **Benchmark Classification**: Development golden set, rule-based planner, not a held-out benchmark. Results indicate baseline rule heuristic conformance against designed development queries.
 
 | Provider | Model | Queries | Exact Match (%) | Task Type Acc (%) | Temporal Acc (%) | AOI Acc (%) |
 |---|---|---|---|---|---|---|
-| Rule-Based | Regex/Keyword Engine | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
-| Gemini | gemini-1.5-flash | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
-| OpenAI | gpt-4o-mini | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
-| Ollama | llama3.2 | 42 | *Run `make evaluate` to populate* | *Run to populate* | *Run to populate* | *Run to populate* |
+| Rule-Based | Regex/Keyword Engine | 42 | 85.71% | 90.48% | 90.48% | 85.71% |
+| Gemini | gemini-1.5-flash | 42 | *Pending API key* | *Pending API key* | *Pending API key* | *Pending API key* |
+| OpenAI | gpt-4o-mini | 42 | *Pending API key* | *Pending API key* | *Pending API key* | *Pending API key* |
+| Ollama | llama3.2 | 42 | *Pending local model* | *Pending local model* | *Pending local model* | *Pending local model* |
 
 ---
 

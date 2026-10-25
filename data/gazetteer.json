@@ -1,0 +1,144 @@
+{
+  "cities": [
+    {
+      "name": "Raipur",
+      "lat": 21.2514,
+      "lon": 81.6296,
+      "display_name": "Raipur, Raipur District, Chhattisgarh, India",
+      "bbox": [81.50, 21.15, 81.80, 21.35]
+    },
+    {
+      "name": "Bhilai",
+      "lat": 21.1938,
+      "lon": 81.3509,
+      "display_name": "Bhilai, Durg District, Chhattisgarh, India",
+      "bbox": [81.25, 21.10, 81.45, 21.30]
+    },
+    {
+      "name": "Bilaspur",
+      "lat": 22.0797,
+      "lon": 82.1409,
+      "display_name": "Bilaspur, Bilaspur District, Chhattisgarh, India",
+      "bbox": [82.05, 21.98, 82.25, 22.18]
+    },
+    {
+      "name": "Nagpur",
+      "lat": 21.1458,
+      "lon": 79.0882,
+      "display_name": "Nagpur, Maharashtra, India",
+      "bbox": [78.95, 21.05, 79.20, 21.25]
+    },
+    {
+      "name": "Bhopal",
+      "lat": 23.2599,
+      "lon": 77.4126,
+      "display_name": "Bhopal, Madhya Pradesh, India",
+      "bbox": [77.30, 23.15, 77.55, 23.35]
+    },
+    {
+      "name": "Delhi",
+      "lat": 28.6139,
+      "lon": 77.2090,
+      "display_name": "New Delhi, Delhi, India",
+      "bbox": [76.95, 28.45, 77.35, 28.85]
+    },
+    {
+      "name": "Mumbai",
+      "lat": 19.0760,
+      "lon": 72.8777,
+      "display_name": "Mumbai, Maharashtra, India",
+      "bbox": [72.75, 18.90, 73.00, 19.25]
+    },
+    {
+      "name": "Chennai",
+      "lat": 13.0827,
+      "lon": 80.2707,
+      "display_name": "Chennai, Tamil Nadu, India",
+      "bbox": [80.15, 12.95, 80.35, 13.20]
+    },
+    {
+      "name": "Hyderabad",
+      "lat": 17.3850,
+      "lon": 78.4867,
+      "display_name": "Hyderabad, Telangana, India",
+      "bbox": [78.35, 17.25, 78.60, 17.50]
+    },
+    {
+      "name": "Bengaluru",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "display_name": "Bengaluru, Karnataka, India",
+      "bbox": [77.45, 12.85, 77.75, 13.10]
+    },
+    {
+      "name": "Kolkata",
+      "lat": 22.5726,
+      "lon": 88.3639,
+      "display_name": "Kolkata, West Bengal, India",
+      "bbox": [88.25, 22.45, 88.45, 22.65]
+    },
+    {
+      "name": "Ahmedabad",
+      "lat": 23.0225,
+      "lon": 72.5714,
+      "display_name": "Ahmedabad, Gujarat, India",
+      "bbox": [72.45, 22.90, 72.70, 23.15]
+    },
+    {
+      "name": "Jaipur",
+      "lat": 26.9124,
+      "lon": 75.7873,
+      "display_name": "Jaipur, Rajasthan, India",
+      "bbox": [75.65, 26.80, 75.95, 27.05]
+    },
+    {
+      "name": "Lucknow",
+      "lat": 26.8467,
+      "lon": 80.9462,
+      "display_name": "Lucknow, Uttar Pradesh, India",
+      "bbox": [80.80, 26.75, 81.10, 26.95]
+    },
+    {
+      "name": "Patna",
+      "lat": 25.5941,
+      "lon": 85.1376,
+      "display_name": "Patna, Bihar, India",
+      "bbox": [85.00, 25.50, 85.25, 25.70]
+    },
+    {
+      "name": "Bhubaneswar",
+      "lat": 20.2961,
+      "lon": 85.8245,
+      "display_name": "Bhubaneswar, Odisha, India",
+      "bbox": [85.70, 20.20, 85.95, 20.40]
+    },
+    {
+      "name": "Vembanad",
+      "lat": 9.6000,
+      "lon": 76.4000,
+      "display_name": "Vembanad Lake, Kerala, India",
+      "bbox": [76.30, 9.50, 76.55, 9.90]
+    },
+    {
+      "name": "Sambhar",
+      "lat": 26.9000,
+      "lon": 75.0000,
+      "display_name": "Sambhar Salt Lake, Rajasthan, India",
+      "bbox": [74.85, 26.85, 75.25, 27.10]
+    },
+    {
+      "name": "Pune",
+      "lat": 18.5204,
+      "lon": 73.8567,
+      "display_name": "Pune, Maharashtra, India",
+      "bbox": [73.75, 18.40, 74.00, 18.65]
+    },
+    {
+      "name": "Chandigarh",
+      "lat": 30.7333,
+      "lon": 76.7794,
+      "display_name": "Chandigarh, India",
+      "bbox": [76.70, 30.65, 76.85, 30.80]
+    }
+  ]
+}

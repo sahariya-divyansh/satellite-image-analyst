@@ -9,33 +9,23 @@
   "temporal": {
     "period_a": {
       "season": "post_monsoon",
-      "window": "2023-10-01 to 2023-11-30",
-      "scenes_analyzed": 4
+      "window": "2023-10-01 to 2023-11-30"
     },
     "period_b": {
       "season": "post_monsoon",
-      "window": "2025-10-01 to 2025-11-30",
-      "scenes_analyzed": 5
+      "window": "2025-10-01 to 2025-11-30"
     }
   },
   "methodology": {
     "index": "MNDWI",
     "formula": "(Green - SWIR1) / (Green + SWIR1)",
-    "otsu_threshold": -0.042,
     "min_area_ha": 0.1
   },
   "statistics": {
-    "total_water_period_a_ha": 14210.4,
-    "total_water_period_b_ha": 16845.2,
-    "net_change_ha": 2634.8,
-    "percent_change": 18.54,
-    "gained_water_ha": 3120.5,
-    "lost_water_ha": 485.7,
-    "persistent_water_ha": 13724.7,
-    "waterbody_count": 86
+    "status": "not_run",
+    "description": "Will be populated exclusively from real runs of the Phase 2 analysis pipeline."
   },
   "layers": {
-    "geojson": "outputs/raipur_2023_2025_water_change.geojson",
-    "cog": "outputs/raipur_2023_2025_water_change.tif"
+    "status": "not_run"
   }
 }

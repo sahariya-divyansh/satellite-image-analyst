@@ -46,7 +46,7 @@ def run_water_eval() -> dict[str, Any]:
                 "characteristic": reg["type"],
                 "season": reg["season"],
                 "metrics": {
-                    "status": "pending_phase_5_download",
+                    "status": "not_run",
                 },
             }
         )

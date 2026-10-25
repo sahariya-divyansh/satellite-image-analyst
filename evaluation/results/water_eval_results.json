@@ -5,7 +5,7 @@
       "characteristic": "Inland Agricultural & Rivers",
       "season": "Post-Monsoon",
       "metrics": {
-        "status": "pending_phase_5_download"
+        "status": "not_run"
       }
     },
     {
@@ -13,7 +13,7 @@
       "characteristic": "Coastal Backwaters & Wetlands",
       "season": "Post-Monsoon",
       "metrics": {
-        "status": "pending_phase_5_download"
+        "status": "not_run"
       }
     },
     {
@@ -21,7 +21,7 @@
       "characteristic": "Arid Saline Playa",
       "season": "Post-Monsoon",
       "metrics": {
-        "status": "pending_phase_5_download"
+        "status": "not_run"
       }
     }
   ]
