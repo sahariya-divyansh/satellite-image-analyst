@@ -247,10 +247,11 @@
     "max_water_area_ha": 2500.39,
     "range_water_area_ha": 1044.7,
     "mean_absolute_annual_step_ha": 458.44,
+    "median_absolute_annual_step_ha": 272.97,
     "average_subsampling_spread_ha": 99.71,
     "observed_2023_2025_delta_ha": 46.66,
     "observed_2023_2025_pct": 2.79,
     "is_within_cyclical_noise": true,
-    "scientific_conclusion": "The observed 2023->2025 net surface water increase of +46.66 ha (+2.79%) is substantially smaller than the historical mean year-to-year step (458.44 ha) and within the range of multi-year cyclical fluctuations (std = 321.72 ha). Therefore, categorizing this shift as structural expansion would be scientifically indefensible; it is properly classified as 'within noise / inconclusive'."
+    "scientific_conclusion": "The observed 2023->2025 net surface water shift of +46.66 ha (+2.79%) is substantially smaller than the historical median year-to-year step (272.97 ha) and mean step (458.44 ha), and well within multi-year cyclical variance (std = 321.72 ha). The shift is consistent with within-noise fluctuations; categorizing it as structural expansion would be indefensible. It is properly classified as 'within noise / inconclusive'."
   }
 }

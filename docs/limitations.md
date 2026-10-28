@@ -27,13 +27,13 @@ Remote sensing workflows provide planetary-scale observation but operate under p
 
 - While automated Otsu thresholding dynamically separates water and land distributions, in scenes dominated (>95%) by dry land with tiny water bodies, the histogram unimodality can degrade Otsu accuracy. The pipeline includes bounds clamping and user overrides (`otsu_offset` or explicit threshold).
 
-## 6. Open-Vocabulary Objects (CLIP/SAM Experimental Module)
+## 6. Open-Vocabulary Objects (CLIP/SAM Experimental Stub)
 
-- Any detection of complex anthropogenic objects (e.g., brick kilns, aquaculture cages) via CLIP/SAM is experimental, uncalibrated for formal cadastral or regulatory enforcement, and must be validated with high-resolution sub-meter aerial or ground truth data.
+- Any detection of complex anthropogenic objects (e.g., brick kilns, aquaculture cages) via CLIP/SAM is strictly a disabled-by-default architectural stub. This module makes no claims of capability, accuracy, or benchmark performance, and is non-functional in the production baseline without dedicated fine-tuning and sub-meter aerial ground truth.
 
 ## 7. Inter-Annual Cyclical Variability & Noise Margins
 
-- **Empirical Variability**: Long-term time-series analysis for Raipur (2018–2025) demonstrates that natural post-monsoon surface water fluctuates with a mean annual step of $458.44\,\text{ha}$ and a standard deviation of $\sigma = 321.72\,\text{ha}$.
-- **Composite Subsampling Sensitivity**: Controlled 20-fold resampling of clear Sentinel-2 scenes demonstrates that composite composition alone introduces a sampling spread of $\approx 99.71\,\text{ha}$.
-- **Attribution Policy**: Observed net changes between two arbitrary years (e.g., $+46.66\,\text{ha}$ between 2023 and 2025) that fall well below annual cyclical noise ($458.44\,\text{ha}$) and sampling spread ($99.71\,\text{ha}$) cannot be defensibly asserted as structural expansion or contraction. The pipeline classifies such changes as `within noise / inconclusive`.
+- **Empirical Variability**: Long-term time-series analysis for Raipur (2018–2025) demonstrates that natural post-monsoon surface water fluctuates with a median consecutive-year step of $272.97\,\text{ha}$, a mean consecutive-year step of $458.44\,\text{ha}$, and a standard deviation of $\sigma = 321.72\,\text{ha}$.
+- **Composite Subsampling Sensitivity**: The $\approx 99.71\,\text{ha}$ average subsampling spread represents a synthetic $\sim 1.5\%$ perturbation model across 20 iterations to estimate composite composition variance, rather than an empirical scene-by-scene jackknife resampling.
+- **Attribution Policy**: Observed net changes between two arbitrary years (e.g., $+46.66\,\text{ha}$ between 2023 and 2025) fall substantially below the median consecutive-year step ($272.97\,\text{ha}$) and within multi-year variance. The observed difference is consistent with within-noise fluctuations; the pipeline reports it as `within noise / inconclusive` rather than claiming structural expansion or contraction.
 - **AOI Bounding Box Policy**: Radial spatial queries (e.g., 'within 15 km of Raipur') define a square UTM projected bounding box envelope of side $2 \times \text{radius}$ ($907.50\,\text{km}^2$ for 15 km half-width). All reported statistics and raster arrays reflect the complete bounding box, which is explicitly reported in every summary.

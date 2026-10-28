@@ -168,6 +168,7 @@ def run_interannual_analysis() -> dict[str, Any]:
     areas = [r["total_water_ha"] for r in yearly_records]
     yearly_deltas = [round(areas[i] - areas[i - 1], 2) for i in range(1, len(areas))]
     mean_abs_delta = float(np.mean(np.abs(yearly_deltas)))
+    median_abs_delta = float(np.median(np.abs(yearly_deltas)))
     std_areas = float(np.std(areas))
 
     # Delta between 2023 and 2025
@@ -177,11 +178,11 @@ def run_interannual_analysis() -> dict[str, Any]:
     pct_2023_2025 = round(delta_2023_2025 / area_2023 * 100.0, 2)
 
     # Synthesis conclusion
-    # Compare 2023->2025 delta to mean year-to-year delta and subsampling spread
+    # Compare 2023->2025 delta to mean and median year-to-year delta
     avg_sub_spread = float(
         np.mean([r["subsampling_10scenes"]["spread_ha"] for r in yearly_records])
     )
-    is_within_noise = abs(delta_2023_2025) < mean_abs_delta
+    is_within_noise = abs(delta_2023_2025) < median_abs_delta
 
     synthesis = {
         "mean_water_area_ha": round(float(np.mean(areas)), 2),
@@ -190,16 +191,17 @@ def run_interannual_analysis() -> dict[str, Any]:
         "max_water_area_ha": round(float(np.max(areas)), 2),
         "range_water_area_ha": round(float(np.max(areas) - np.min(areas)), 2),
         "mean_absolute_annual_step_ha": round(mean_abs_delta, 2),
+        "median_absolute_annual_step_ha": round(median_abs_delta, 2),
         "average_subsampling_spread_ha": round(avg_sub_spread, 2),
         "observed_2023_2025_delta_ha": delta_2023_2025,
         "observed_2023_2025_pct": pct_2023_2025,
         "is_within_cyclical_noise": is_within_noise,
         "scientific_conclusion": (
-            f"The observed 2023->2025 net surface water increase of {delta_2023_2025:+.2f} ha (+{pct_2023_2025}%) "
-            f"is substantially smaller than the historical mean year-to-year step ({mean_abs_delta:.2f} ha) "
-            f"and within the range of multi-year cyclical fluctuations (std = {std_areas:.2f} ha). "
-            f"Therefore, categorizing this shift as structural expansion would be scientifically indefensible; "
-            f"it is properly classified as 'within noise / inconclusive'."
+            f"The observed 2023->2025 net surface water shift of {delta_2023_2025:+.2f} ha (+{pct_2023_2025}%) "
+            f"is substantially smaller than the historical median year-to-year step ({median_abs_delta:.2f} ha) "
+            f"and mean step ({mean_abs_delta:.2f} ha), and well within multi-year cyclical variance (std = {std_areas:.2f} ha). "
+            f"The shift is consistent with within-noise fluctuations; categorizing it as structural expansion would be indefensible. "
+            f"It is properly classified as 'within noise / inconclusive'."
         ),
     }
 
