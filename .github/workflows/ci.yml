@@ -69,7 +69,7 @@ jobs:
 
       - name: Run Pytest with Coverage
         run: |
-          pytest -v --cov=src/satellite_analyst --cov-report=xml:coverage.xml tests/unit
+          pytest -v --cov --cov-report=xml:coverage.xml tests/unit
 
       - name: Verify Coverage Threshold (>=80%)
         run: |

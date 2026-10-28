@@ -2,9 +2,9 @@ cff-version: 1.2.0
 message: "If you use this software in your research or geospatial projects, please cite it as below."
 title: "Natural-Language Satellite Image Analyst"
 authors:
-  - name: "Satellite Analyst Contributors"
+  - given-names: "Divyansh"
 version: 0.1.0
-date-released: 2025-10-25
+date-released: 2026-10-28
 url: "https://github.com/sahariya-divyansh/satellite-image-analyst"
 repository-code: "https://github.com/sahariya-divyansh/satellite-image-analyst"
 keywords:
