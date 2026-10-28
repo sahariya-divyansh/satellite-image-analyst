@@ -1,0 +1,548 @@
+{
+  "diagnostics": {
+    "raipur_2020": {
+      "aoi": "Raipur, Chhattisgarh",
+      "year": 2020,
+      "total_water_pixels_10m": 68578,
+      "total_water_ha": 685.78,
+      "worldcover_breakdown": {
+        "class_10_Tree cover": {
+          "pixels": 4208,
+          "pct_of_water": 6.14
+        },
+        "class_20_Shrubland": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_30_Grassland": {
+          "pixels": 7906,
+          "pct_of_water": 11.53
+        },
+        "class_40_Cropland": {
+          "pixels": 8419,
+          "pct_of_water": 12.28
+        },
+        "class_50_Built-up": {
+          "pixels": 1831,
+          "pct_of_water": 2.67
+        },
+        "class_60_Bare / sparse": {
+          "pixels": 1766,
+          "pct_of_water": 2.58
+        },
+        "class_70_Snow and ice": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_80_Permanent water": {
+          "pixels": 44448,
+          "pct_of_water": 64.81
+        },
+        "class_90_Herbaceous wetland": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_95_Mangroves": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_100_Moss and lichen": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        }
+      },
+      "jrc_occurrence_breakdown": {
+        "0% (never water in JRC 35-yr record)": {
+          "pixels": 21811,
+          "pct_of_water": 31.8
+        },
+        "1-10% (low occurrence / ephemeral flood)": {
+          "pixels": 5081,
+          "pct_of_water": 7.41
+        },
+        "10-50% (seasonal water)": {
+          "pixels": 19797,
+          "pct_of_water": 28.87
+        },
+        ">=50% (permanent water)": {
+          "pixels": 21889,
+          "pct_of_water": 31.92
+        }
+      }
+    },
+    "raipur_2023": {
+      "aoi": "Raipur, Chhattisgarh",
+      "year": 2023,
+      "total_water_pixels_10m": 185110,
+      "total_water_ha": 1851.1,
+      "worldcover_breakdown": {
+        "class_10_Tree cover": {
+          "pixels": 15295,
+          "pct_of_water": 8.26
+        },
+        "class_20_Shrubland": {
+          "pixels": 1,
+          "pct_of_water": 0.0
+        },
+        "class_30_Grassland": {
+          "pixels": 31288,
+          "pct_of_water": 16.9
+        },
+        "class_40_Cropland": {
+          "pixels": 40823,
+          "pct_of_water": 22.05
+        },
+        "class_50_Built-up": {
+          "pixels": 8249,
+          "pct_of_water": 4.46
+        },
+        "class_60_Bare / sparse": {
+          "pixels": 12645,
+          "pct_of_water": 6.83
+        },
+        "class_70_Snow and ice": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_80_Permanent water": {
+          "pixels": 76757,
+          "pct_of_water": 41.47
+        },
+        "class_90_Herbaceous wetland": {
+          "pixels": 52,
+          "pct_of_water": 0.03
+        },
+        "class_95_Mangroves": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_100_Moss and lichen": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        }
+      },
+      "jrc_occurrence_breakdown": {
+        "0% (never water in JRC 35-yr record)": {
+          "pixels": 92084,
+          "pct_of_water": 49.75
+        },
+        "1-10% (low occurrence / ephemeral flood)": {
+          "pixels": 14170,
+          "pct_of_water": 7.65
+        },
+        "10-50% (seasonal water)": {
+          "pixels": 49330,
+          "pct_of_water": 26.65
+        },
+        ">=50% (permanent water)": {
+          "pixels": 29526,
+          "pct_of_water": 15.95
+        }
+      }
+    },
+    "bhopal_2020": {
+      "aoi": "Bhopal, Madhya Pradesh",
+      "year": 2020,
+      "total_water_pixels_10m": 386576,
+      "total_water_ha": 3865.76,
+      "worldcover_breakdown": {
+        "class_10_Tree cover": {
+          "pixels": 24029,
+          "pct_of_water": 6.22
+        },
+        "class_20_Shrubland": {
+          "pixels": 320,
+          "pct_of_water": 0.08
+        },
+        "class_30_Grassland": {
+          "pixels": 39114,
+          "pct_of_water": 10.12
+        },
+        "class_40_Cropland": {
+          "pixels": 32595,
+          "pct_of_water": 8.43
+        },
+        "class_50_Built-up": {
+          "pixels": 2622,
+          "pct_of_water": 0.68
+        },
+        "class_60_Bare / sparse": {
+          "pixels": 624,
+          "pct_of_water": 0.16
+        },
+        "class_70_Snow and ice": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_80_Permanent water": {
+          "pixels": 287263,
+          "pct_of_water": 74.31
+        },
+        "class_90_Herbaceous wetland": {
+          "pixels": 9,
+          "pct_of_water": 0.0
+        },
+        "class_95_Mangroves": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        },
+        "class_100_Moss and lichen": {
+          "pixels": 0,
+          "pct_of_water": 0.0
+        }
+      },
+      "jrc_occurrence_breakdown": {
+        "0% (never water in JRC 35-yr record)": {
+          "pixels": 54626,
+          "pct_of_water": 14.13
+        },
+        "1-10% (low occurrence / ephemeral flood)": {
+          "pixels": 16640,
+          "pct_of_water": 4.3
+        },
+        "10-50% (seasonal water)": {
+          "pixels": 72657,
+          "pct_of_water": 18.8
+        },
+        ">=50% (permanent water)": {
+          "pixels": 242653,
+          "pct_of_water": 62.77
+        }
+      }
+    }
+  },
+  "variant_evaluations": {
+    "raipur": {
+      "mndwi_gt_0 (baseline)": {
+        "metrics": {
+          "iou": 0.2173,
+          "precision": 0.656,
+          "recall": 0.2453,
+          "f1": 0.3571,
+          "tp_pixels": 43898,
+          "fp_pixels": 23017,
+          "fn_pixels": 135065,
+          "tn_pixels": 8876108,
+          "water_pixels_ref": 178963,
+          "water_pixels_pred": 66915,
+          "total_valid_pixels": 9078088
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.2003,
+            0.2417
+          ],
+          "f1_ci_95": [
+            0.3337,
+            0.3893
+          ]
+        }
+      },
+      "mndwi_gt_0_and_ndvi_lt_0.1": {
+        "metrics": {
+          "iou": 0.1908,
+          "precision": 0.6516,
+          "recall": 0.2125,
+          "f1": 0.3205,
+          "tp_pixels": 38034,
+          "fp_pixels": 20336,
+          "fn_pixels": 140929,
+          "tn_pixels": 8878789,
+          "water_pixels_ref": 178963,
+          "water_pixels_pred": 58370,
+          "total_valid_pixels": 9078088
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.1757,
+            0.2132
+          ],
+          "f1_ci_95": [
+            0.2989,
+            0.3515
+          ]
+        }
+      },
+      "awei_nsh_gt_0": {
+        "metrics": {
+          "iou": 0.1875,
+          "precision": 0.691,
+          "recall": 0.2047,
+          "f1": 0.3158,
+          "tp_pixels": 36631,
+          "fp_pixels": 16380,
+          "fn_pixels": 142332,
+          "tn_pixels": 8882745,
+          "water_pixels_ref": 178963,
+          "water_pixels_pred": 53011,
+          "total_valid_pixels": 9078088
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.1693,
+            0.2111
+          ],
+          "f1_ci_95": [
+            0.2896,
+            0.3486
+          ]
+        }
+      },
+      "awei_sh_gt_0": {
+        "metrics": {
+          "iou": 0.2206,
+          "precision": 0.6517,
+          "recall": 0.2501,
+          "f1": 0.3615,
+          "tp_pixels": 44756,
+          "fp_pixels": 23919,
+          "fn_pixels": 134207,
+          "tn_pixels": 8875206,
+          "water_pixels_ref": 178963,
+          "water_pixels_pred": 68675,
+          "total_valid_pixels": 9078088
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.2035,
+            0.2455
+          ],
+          "f1_ci_95": [
+            0.3382,
+            0.3942
+          ]
+        }
+      }
+    },
+    "bhopal": {
+      "mndwi_gt_0 (baseline)": {
+        "metrics": {
+          "iou": 0.6524,
+          "precision": 0.7431,
+          "recall": 0.8425,
+          "f1": 0.7897,
+          "tp_pixels": 287263,
+          "fp_pixels": 99313,
+          "fn_pixels": 53720,
+          "tn_pixels": 8880449,
+          "water_pixels_ref": 340983,
+          "water_pixels_pred": 386576,
+          "total_valid_pixels": 9320745
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.6305,
+            0.6717
+          ],
+          "f1_ci_95": [
+            0.7734,
+            0.8036
+          ]
+        }
+      },
+      "mndwi_gt_0_and_ndvi_lt_0.1": {
+        "metrics": {
+          "iou": 0.6581,
+          "precision": 0.7771,
+          "recall": 0.8113,
+          "f1": 0.7938,
+          "tp_pixels": 276642,
+          "fp_pixels": 79371,
+          "fn_pixels": 64341,
+          "tn_pixels": 8900391,
+          "water_pixels_ref": 340983,
+          "water_pixels_pred": 356013,
+          "total_valid_pixels": 9320745
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.6361,
+            0.6783
+          ],
+          "f1_ci_95": [
+            0.7776,
+            0.8083
+          ]
+        }
+      },
+      "awei_nsh_gt_0": {
+        "metrics": {
+          "iou": 0.659,
+          "precision": 0.7622,
+          "recall": 0.8295,
+          "f1": 0.7944,
+          "tp_pixels": 282830,
+          "fp_pixels": 88226,
+          "fn_pixels": 58153,
+          "tn_pixels": 8891536,
+          "water_pixels_ref": 340983,
+          "water_pixels_pred": 371056,
+          "total_valid_pixels": 9320745
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.6365,
+            0.6803
+          ],
+          "f1_ci_95": [
+            0.7779,
+            0.8097
+          ]
+        }
+      },
+      "awei_sh_gt_0": {
+        "metrics": {
+          "iou": 0.6608,
+          "precision": 0.7658,
+          "recall": 0.8281,
+          "f1": 0.7957,
+          "tp_pixels": 282383,
+          "fp_pixels": 86362,
+          "fn_pixels": 58600,
+          "tn_pixels": 8893400,
+          "water_pixels_ref": 340983,
+          "water_pixels_pred": 368745,
+          "total_valid_pixels": 9320745
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.639,
+            0.6814
+          ],
+          "f1_ci_95": [
+            0.7798,
+            0.8105
+          ]
+        }
+      }
+    },
+    "jodhpur": {
+      "mndwi_gt_0 (baseline)": {
+        "metrics": {
+          "iou": 0.1879,
+          "precision": 0.5203,
+          "recall": 0.2273,
+          "f1": 0.3164,
+          "tp_pixels": 6080,
+          "fp_pixels": 5606,
+          "fn_pixels": 20665,
+          "tn_pixels": 9267043,
+          "water_pixels_ref": 26745,
+          "water_pixels_pred": 11686,
+          "total_valid_pixels": 9299394
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.1406,
+            0.2338
+          ],
+          "f1_ci_95": [
+            0.2466,
+            0.379
+          ]
+        }
+      },
+      "mndwi_gt_0_and_ndvi_lt_0.1": {
+        "metrics": {
+          "iou": 0.1819,
+          "precision": 0.5331,
+          "recall": 0.2163,
+          "f1": 0.3078,
+          "tp_pixels": 5786,
+          "fp_pixels": 5068,
+          "fn_pixels": 20959,
+          "tn_pixels": 9267581,
+          "water_pixels_ref": 26745,
+          "water_pixels_pred": 10854,
+          "total_valid_pixels": 9299394
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.1365,
+            0.2292
+          ],
+          "f1_ci_95": [
+            0.2401,
+            0.3729
+          ]
+        }
+      },
+      "awei_nsh_gt_0": {
+        "metrics": {
+          "iou": 0.1409,
+          "precision": 0.5355,
+          "recall": 0.1605,
+          "f1": 0.247,
+          "tp_pixels": 4293,
+          "fp_pixels": 3724,
+          "fn_pixels": 22452,
+          "tn_pixels": 9268925,
+          "water_pixels_ref": 26745,
+          "water_pixels_pred": 8017,
+          "total_valid_pixels": 9299394
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.0919,
+            0.1864
+          ],
+          "f1_ci_95": [
+            0.1683,
+            0.3142
+          ]
+        }
+      },
+      "awei_sh_gt_0": {
+        "metrics": {
+          "iou": 0.1916,
+          "precision": 0.5253,
+          "recall": 0.2317,
+          "f1": 0.3216,
+          "tp_pixels": 6197,
+          "fp_pixels": 5599,
+          "fn_pixels": 20548,
+          "tn_pixels": 9267050,
+          "water_pixels_ref": 26745,
+          "water_pixels_pred": 11796,
+          "total_valid_pixels": 9299394
+        },
+        "ci_95": {
+          "iou_ci_95": [
+            0.1439,
+            0.2394
+          ],
+          "f1_ci_95": [
+            0.2516,
+            0.3863
+          ]
+        }
+      }
+    }
+  },
+  "pooled_selection": {
+    "pooled_f1_raipur_bhopal": {
+      "mndwi_gt_0 (baseline)": 0.6804,
+      "mndwi_gt_0_and_ndvi_lt_0.1": 0.6736,
+      "awei_nsh_gt_0": 0.6768,
+      "awei_sh_gt_0": 0.6834
+    },
+    "selected_variant": "awei_sh_gt_0"
+  },
+  "raipur_2023_2025_comparison": {
+    "baseline_mndwi": {
+      "area_2023_ha": 1851.1,
+      "area_2025_ha": 1776.19,
+      "net_delta_ha": -74.91,
+      "net_delta_pct": -4.05,
+      "verdict": "within noise / inconclusive"
+    },
+    "selected_variant": {
+      "variant_name": "awei_sh_gt_0",
+      "area_2023_ha": 1862.84,
+      "area_2025_ha": 1833.82,
+      "net_delta_ha": -29.02,
+      "net_delta_pct": -1.56,
+      "verdict": "within noise / inconclusive"
+    }
+  }
+}

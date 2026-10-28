@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     min_year: int = 2017
     churn_ratio_threshold: float = 0.25
     persistent_area_significance_pct: float = 10.0
+    water_mask_variant: Literal["mndwi", "awei_sh", "awei_nsh", "mndwi_ndvi"] = "mndwi"
 
     # API & Job Execution System
     demo_mode: bool = False
