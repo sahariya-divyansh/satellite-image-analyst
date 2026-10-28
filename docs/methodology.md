@@ -58,6 +58,24 @@ $$\text{MNDWI} = \frac{\rho_{\text{Green}} - \rho_{\text{SWIR1}}}{\rho_{\text{Gr
 
 - Water typically displays positive values ($\text{MNDWI} > 0$), while soil, vegetation, and urban infrastructure exhibit negative values.
 
+## 4.1 Water Masking Variants & Architectural Evaluation
+
+In addition to baseline MNDWI, `satellite_analyst` implements four water extraction formulations configurable via `Settings.water_mask_variant`:
+
+1. **`mndwi` (Default)**: $\text{MNDWI} = \frac{\text{B03} - \text{B11}}{\text{B03} + \text{B11}} > 0.0$ (Xu, 2006). Uses Green and SWIR1 bands.
+2. **`mndwi_ndvi`**: $\text{MNDWI} > 0.0 \land \text{NDVI} < 0.10$ where $\text{NDVI} = \frac{\text{B08} - \text{B04}}{\text{B08} + \text{B04}}$. Suppresses false positives in flooded vegetation and aquatic weed patches.
+3. **`awei_sh`**: Automated Water Extraction Index with shadow elimination (Feyisa et al., 2014):
+   $$\text{AWEIsh} = \text{B02} + 2.5 \times \text{B03} - 1.5 \times (\text{B08} + \text{B11}) - 0.25 \times \text{B12} > 0.0$$
+4. **`awei_nsh`**: Automated Water Extraction Index non-shadow (Feyisa et al., 2014):
+   $$\text{AWEInsh} = 4 \times (\text{B03} - \text{B11}) - (0.25 \times \text{B08} + 2.75 \times \text{B12}) > 0.0$$
+
+**Empirical Evaluation & Default Rationale**:
+As detailed in [`docs/evaluation.md`](evaluation.md), all four variants were systematically benchmarked against ESA WorldCover 10m permanent water (Class 80) across the Raipur and Bhopal development pool and tested on an untouched held-out AOI (Jodhpur, Rajasthan):
+- **Pooled Development F1 (Raipur + Bhopal)**: AWEIsh (**0.6834**), Baseline MNDWI (**0.6804**), AWEInsh (**0.6768**), MNDWI + NDVI (**0.6736**).
+- **Held-Out Test F1 (Jodhpur)**: AWEIsh (**0.3216**), Baseline MNDWI (**0.3164**), MNDWI + NDVI (**0.3078**), AWEInsh (**0.2470**).
+
+Because the 95% bootstrap confidence intervals for AWEIsh and MNDWI overlap completely across all three sites (e.g. Raipur: `[0.338, 0.394]` vs `[0.334, 0.389]`; Bhopal: `[0.780, 0.811]` vs `[0.773, 0.804]`), the performance difference ($\Delta \text{F1} \approx +0.003$) is statistically indistinguishable and does not alter the underlying phenological ephemerality of flooded cropland post-monsoon. Baseline `mndwi` is therefore preserved as the production default to minimize band I/O (requiring 2 bands instead of 5), while exposing alternative variants for specialized research.
+
 ## 5. Thresholding & Morphological Refinement
 
 1. **Adaptive Thresholding**: Otsu's method determines an optimal threshold $T^*$ separating the bimodal distribution of MNDWI values over the AOI:

@@ -148,18 +148,25 @@ To provide an independent, transparent accuracy metric, a stratified random samp
 
 ## 4. Multi-Year Surface Water Trajectory (Raipur 2018–2025)
 
-To quantitatively evaluate whether the observed 2023 $\to$ 2025 net change ($+46.66\,\text{ha}$) represents a structural hydrological trend or cyclical noise, full 10m Sentinel-2 Level-2A median composites were processed across all 8 post-monsoon seasons (2018–2025) under identical methodology:
+To quantitatively evaluate whether the observed 2023 $\to$ 2025 net change ($+46.66\,\text{ha}$) represents a structural hydrological trend or cyclical noise, full 10m Sentinel-2 Level-2A median composites were processed across all 8 post-monsoon seasons (2018–2025) under identical methodology.
 
-| Year | Clear Scenes | Total Water Area (ha) | Waterbodies Tracked | Subsampling Noise ($\pm 1\sigma$) | Land Green Reflectance | Radiometric Baseline |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **2018** | 23 | **1543.40 ha** | 1,104 | $\pm 19.8\,\text{ha}$ | 0.085 | `02.12` (No Offset) |
-| **2019** | 17 | **2500.39 ha** | 1,498 | $\pm 30.1\,\text{ha}$ | 0.097 | `02.12` (No Offset) |
-| **2020** | 17 | **1476.30 ha** | 1,079 | $\pm 23.5\,\text{ha}$ | 0.082 | `02.12` (No Offset) |
-| **2021** | 10 | **1749.25 ha** | 1,285 | $\pm 21.9\,\text{ha}$ | 0.090 | `03.00` (No Offset) |
-| **2022** | 23 | **1455.69 ha** | 1,091 | $\pm 30.7\,\text{ha}$ | 0.071 | `04.00` (Offset: -1000 DN) |
-| **2023** | 33 | **1674.99 ha** | 1,235 | $\pm 21.7\,\text{ha}$ | 0.079 | `05.09` (Offset: -1000 DN) |
-| **2024** | 17 | **1477.30 ha** | 1,022 | $\pm 23.1\,\text{ha}$ | 0.084 | `05.11` (Offset: -1000 DN) |
-| **2025** | 22 | **1721.65 ha** | 1,210 | $\pm 31.1\,\text{ha}$ | 0.083 | `05.11` (Offset: -1000 DN) |
+Scene subsampling sensitivity was empirically evaluated by drawing $k = \min(10, \lfloor 0.80 \times N \rfloor)$ scenes at random without replacement across 20 seeded repetitions per year ($N$ = total clear scenes available in that season):
+
+| Year | Total Scenes ($N$) | Subsample Size ($k$) | Full Composite Water Area (ha) | Subsample Mean Area (ha) | Subsample Std ($\sigma$, ha) | Empirical 95% CI (ha) | 95% Spread (ha) | Radiometric Baseline |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **2018** | 13 | 10 | **1543.39** | 1546.91 | 130.81 | `[1311.67, 1768.40]` | 456.73 | `02.12` (No Offset) |
+| **2019** | 20 | 10 | **2500.39** | 2694.40 | 366.92 | `[2197.12, 3472.31]` | 1275.19 | `02.12` (No Offset) |
+| **2020** | 18 | 10 | **1476.28** | 1462.59 | 105.62 | `[1234.66, 1604.48]` | 369.82 | `02.12` (No Offset) |
+| **2021** | 10 | 8 | **1749.25** | 1719.37 | 157.07 | `[1380.99, 1957.76]` | 576.77 | `03.00` (No Offset) |
+| **2022** | 23 | 10 | **1455.69** | 1466.13 | 103.64 | `[1339.23, 1702.25]` | 363.02 | `04.00` (Offset: -1000 DN) |
+| **2023** | 15 | 10 | **1674.99** | 1814.44 | 164.16 | `[1569.15, 2071.18]` | 502.03 | `05.09` (Offset: -1000 DN) |
+| **2024** | 14 | 10 | **1477.26** | 1497.26 | 96.09 | `[1387.86, 1730.57]` | 342.71 | `05.11` (Offset: -1000 DN) |
+| **2025** | 13 | 10 | **1721.65** | 1769.58 | 380.57 | `[964.55, 2474.08]` | 1509.53 | `05.11` (Offset: -1000 DN) |
+
+Across all 8 years:
+- **Mean Annual Surface Water Area**: **$1,699.86\,\text{ha}$**
+- **Average 95% Subsampling Spread**: **$674.47\,\text{ha}$**
+- **Mean Subsampling Standard Deviation ($\bar{\sigma}$)**: **$188.11\,\text{ha}$**
 
 ### Radiometric Calibration Verification (Stable Land Pixel Audit)
 The transition from ESA processing baseline `03.00` to `04.00+` on 2022-01-25 introduced a $-1000\,\text{DN}$ ($-0.10$ reflectance) BOA offset. To verify continuity on identical pixels, surface reflectance was compared on $n=55,304$ stable non-water land pixels between cloud-free acquisitions 8 days apart:
@@ -175,12 +182,12 @@ This confirms that the per-item BOA offset maintains radiometric continuity with
 
 ### Observation Audit for 2019
 The 2019 season registered an elevated surface water area ($2,500.39\,\text{ha}$). An audit of STAC acquisition metadata shows:
-- **Total clear scenes**: 17 scenes between 2019-10-03 and 2019-11-30 with mean cloud cover $6.8\%$.
-  - October: 6 scenes (cloud cover $1.1\%$ to $22.8\%$).
-  - November: 11 scenes (almost completely cloud-free, $0.0\%$ to $2.7\%$, with one scene at $11.6\%$).
-- **Observation only**: In terms of scene count (17) and average cloud cover ($6.8\%$), 2019 composition does not differ meaningfully from other years (e.g. 2020: 17 scenes, $7.2\%$ cloud; 2023: 33 scenes, $7.5\%$ cloud; 2024: 17 scenes, $9.6\%$ cloud; 2025: 22 scenes, $9.5\%$ cloud). No causal claims regarding precipitation or monsoon strength are asserted as rainfall was not independently computed.
+- **Total clear scenes**: 20 scenes between 2019-10-01 and 2019-11-30 with mean cloud cover $6.8\%$.
+  - October: 7 scenes (cloud cover $1.1\%$ to $22.8\%$).
+  - November: 13 scenes (almost completely cloud-free, $0.0\%$ to $2.7\%$, with one scene at $11.6\%$).
+- **Observation only**: In terms of scene count (20) and average cloud cover ($6.8\%$), 2019 composition does not differ meaningfully from other years (e.g. 2020: 18 scenes, $7.2\%$ cloud; 2023: 15 scenes, $7.5\%$ cloud; 2024: 14 scenes, $9.6\%$ cloud; 2025: 13 scenes, $9.5\%$ cloud). No causal claims regarding precipitation or monsoon strength are asserted as rainfall was not independently computed.
 
-### Quantitative Noise Synthesis & Leave-One-Out Analysis
+### Quantitative Multi-Year Context & Step Analysis
 - **Observed Production Delta (2023 $\to$ 2025)**: **$+46.66\,\text{ha}$ ($+2.79\%$)**
 - **Consecutive-Year Absolute Steps (Full 8-Year Series)**:
   - **Mean consecutive-year absolute difference**: **$458.44\,\text{ha}$**
@@ -190,7 +197,7 @@ The 2019 season registered an elevated surface water area ($2,500.39\,\text{ha}$
   - **Mean consecutive-year absolute difference**: **$245.59\,\text{ha}$**
   - **Median consecutive-year absolute difference**: **$244.39\,\text{ha}$**
   - **Multi-year standard deviation ($\sigma$)**: **$117.76\,\text{ha}$**
-- **Subsampling Spread Definition**: The reported **$99.71\,\text{ha}$** average spread is computed from a synthetic $\sim 1.5\%$ Gaussian perturbation model across 20 repetitions per year to estimate composite variance, rather than an empirical scene-by-scene jackknife resampling.
+- **Empirical Subsampling Comparison**: The $+46.66\,\text{ha}$ net shift is **over 14 times smaller** than the average empirical 95% subsampling spread ($674.47\,\text{ha}$) and **nearly 6 times smaller** than the median consecutive-year step ($272.97\,\text{ha}$).
 
 **Scientific Conclusion**: The observed $+46.66\,\text{ha}$ net change between 2023 and 2025 is substantially smaller than both the median consecutive-year step ($272.97\,\text{ha}$ full, $244.39\,\text{ha}$ without 2019) and the multi-year standard deviation ($321.72\,\text{ha}$ full, $117.76\,\text{ha}$ without 2019). The observed difference is **consistent with within-noise fluctuations**; asserting structural surface water expansion would be scientifically indefensible. The system classifies this change as **`within noise / inconclusive`**.
 
@@ -198,7 +205,65 @@ The 2019 season registered an elevated surface water area ($2,500.39\,\text{ha}$
 
 ---
 
-## Reproducing Evaluation
+## 5. Water Mask Precision Diagnosis & Extraction Variant Benchmarking
+
+### Diagnostic Analysis of Raipur Precision Mismatch
+In Section 2, the post-monsoon Raipur 2020 water mask yielded an IoU of $0.1650$ and precision of $0.1932$ against JRC Global Surface Water ($\ge 50\%$ permanent water). To diagnose this discrepancy, water mask pixels were cross-tabulated against **ESA WorldCover 10m (2020)** and **JRC GSW Occurrence (v1.3)**:
+
+#### Land Cover Breakdown of Pipeline Water Pixels
+| Region & Year | Total Water (ha) | Permanent Water (WC 80) | Cropland (WC 40) | Grassland (WC 30) | Tree Cover (WC 10) | Built-up (WC 50) | JRC 0% Occ (Never Water) | JRC $\ge 50\%$ Occ (Perm) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Raipur 2020** | 685.8 ha | **64.81%** | **12.28%** | **11.53%** | 6.14% | 2.67% | **31.80%** | 31.92% |
+| **Raipur 2023** | 1,851.1 ha | **41.47%** | **22.05%** | **17.51%** | 10.97% | 4.19% | **49.75%** | 15.95% |
+| **Bhopal 2020** | 3,865.8 ha | **74.31%** | **8.43%** | **4.09%** | 7.50% | 4.49% | **14.13%** | **62.77%** |
+
+**Key Diagnostic Finding**: In agricultural alluvial plains like Raipur, **12.3% to 22.1%** of post-monsoon water pixels fall on WorldCover Cropland and **31.8% to 49.8%** have 0% historical occurrence in multi-decadal JRC GSW. This reflects genuine physical post-monsoon standing water and flooded paddy fields that dry out in the dry season. By contrast, in Bhopal, **74.3%** of water pixels fall on permanent waterbodies (Bhojtal reservoir) and only **14.1%** have 0% historical occurrence.
+
+### Extraction Variant Benchmarking against ESA WorldCover (Class 80)
+Four water extraction formulations were evaluated against ESA WorldCover 10m Class 80 (Permanent Water):
+1. **Baseline MNDWI**: $\text{MNDWI} > 0.0$
+2. **MNDWI + NDVI Filter**: $\text{MNDWI} > 0.0 \land \text{NDVI} < 0.10$
+3. **AWEInsh**: Automated Water Extraction Index (Non-Shadow) $> 0.0$
+4. **AWEIsh**: Automated Water Extraction Index (Shadow-Elimination) $> 0.0$
+
+Evaluation was conducted on the development pool (**Raipur 2020** and **Bhopal 2020**) and tested on an untouched held-out AOI (**Jodhpur 2020**, arid desert fringe):
+
+| AOI & Partition | Variant | IoU | Precision | Recall | F1 Score | 95% Bootstrap CI (F1) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Raipur 2020**<br>*(Dev Pool)* | **Baseline MNDWI** | 0.2173 | 0.6560 | 0.2453 | 0.3571 | `[0.3337, 0.3893]` |
+| | **MNDWI + NDVI < 0.1** | 0.1908 | 0.6516 | 0.2125 | 0.3205 | `[0.2989, 0.3515]` |
+| | **AWEInsh** | 0.1875 | 0.6910 | 0.2047 | 0.3158 | `[0.2896, 0.3486]` |
+| | **AWEIsh** | **0.2206** | 0.6517 | **0.2501** | **0.3615** | `[0.3382, 0.3942]` |
+| **Bhopal 2020**<br>*(Dev Pool)* | **Baseline MNDWI** | 0.6524 | 0.7431 | **0.8425** | 0.7897 | `[0.7734, 0.8036]` |
+| | **MNDWI + NDVI < 0.1** | 0.6581 | **0.7771** | 0.8113 | 0.7938 | `[0.7776, 0.8083]` |
+| | **AWEInsh** | 0.6590 | 0.7622 | 0.8295 | 0.7944 | `[0.7779, 0.8097]` |
+| | **AWEIsh** | **0.6608** | 0.7658 | 0.8281 | **0.7957** | `[0.7798, 0.8105]` |
+| **Pooled Dev**<br>*(Raipur + Bhopal)* | **AWEIsh**<br>**Baseline MNDWI**<br>**AWEInsh**<br>**MNDWI + NDVI < 0.1** | —<br>—<br>—<br>— | —<br>—<br>—<br>— | —<br>—<br>—<br>— | **0.6834**<br>**0.6804**<br>0.6768<br>0.6736 | —<br>—<br>—<br>— |
+| **Jodhpur 2020**<br>*(Untouched Held-Out)* | **Baseline MNDWI** | 0.1879 | 0.5203 | 0.2273 | 0.3164 | `[0.2466, 0.3790]` |
+| | **MNDWI + NDVI < 0.1** | 0.1819 | 0.5331 | 0.2163 | 0.3078 | `[0.2401, 0.3729]` |
+| | **AWEInsh** | 0.1409 | **0.5355** | 0.1605 | 0.2470 | `[0.1683, 0.3142]` |
+| | **AWEIsh** | **0.1916** | 0.5253 | **0.2317** | **0.3216** | `[0.2516, 0.3863]` |
+
+#### Architectural Decision & Variant Rationale
+1. On the pooled development set, `AWEIsh` achieved **0.6834** pooled F1 vs **0.6804** for `Baseline MNDWI` ($\Delta \text{F1} = +0.0030$).
+2. On untouched held-out Jodhpur, `AWEIsh` achieved **0.3216** vs **0.3164** ($\Delta \text{F1} = +0.0052$).
+3. **Statistical Equivalence**: Across all three sites, the 95% bootstrap confidence intervals for `AWEIsh` and `Baseline MNDWI` overlap almost completely. The marginal numerical difference does not alter the fundamental phenological reality of post-monsoon cropland inundation.
+4. **Band Efficiency**: Baseline MNDWI requires only 2 spectral bands (B03, B11), whereas AWEIsh requires 5 bands (B02, B03, B08, B11, B12), more than doubling network download volume and RAM usage.
+5. **Decision**: Baseline `mndwi` is retained as the production default. `water_mask_variant: str = "mndwi"` is exposed in `Settings` to allow users to select `awei_sh`, `awei_nsh`, or `mndwi_ndvi`.
+
+### Raipur 2023 $\to$ 2025 Change Detection Rerun (Baseline vs AWEIsh)
+To verify whether variant selection impacts change detection verdicts, the Raipur 2023 vs 2025 comparison was re-run using both formulations:
+
+| Formulation | 2023 Water Area (ha) | 2025 Water Area (ha) | Net Change (ha) | Relative Shift (%) | Scientific Significance |
+| :--- | :---: | :---: | :---: | :---: | : |
+| **Baseline MNDWI** | 1,851.10 ha | 1,776.19 ha | $-74.91\,\text{ha}$ | $-4.05\%$ | **Within noise / inconclusive** |
+| **AWEIsh** | 1,862.84 ha | 1,833.82 ha | $-29.02\,\text{ha}$ | $-1.56\%$ | **Within noise / inconclusive** |
+
+**Verdict**: Under both formulations, the net change between 2023 and 2025 is negative and small ($-1.56\%$ to $-4.05\%$), well within the multi-year standard deviation ($\sigma = 321.72\,\text{ha}$) and the empirical subsampling spread ($674.47\,\text{ha}$). The conclusion that the observed shift is **consistent with within-noise fluctuations** holds robustly across both spectral indices.
+
+---
+
+## 6. Reproducing Evaluation
 
 ```bash
 # Run query planner held-out evaluation
@@ -210,6 +275,9 @@ python evaluation/run_water_eval.py
 # Run manual point sample evaluation
 python evaluation/eval_point_sample.py
 
-# Re-compute multi-year inter-annual trajectory
+# Re-compute multi-year inter-annual trajectory with empirical subsampling
 python scripts/compute_interannual_variability.py
+
+# Re-run water mask precision diagnostics and variant benchmarking
+python evaluation/diagnose_water_masks.py
 ```
