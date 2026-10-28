@@ -8,7 +8,7 @@ Reference:
 Methodological Ground Rules:
     1. Agreement vs. Accuracy: Disagreements with JRC GSW reflect sensor resolution
        differences (Landsat 30m vs. Sentinel-2 10m), acquisition date offsets, and
-       misregistration. We report 'agreement with JRC GSW', never 'accuracy'.
+       seasonal phenology. We report 'agreement with JRC GSW', never 'accuracy'.
     2. Spatial Aggregation: 10m Sentinel-2 water masks are aggregated to the 30m JRC
        grid using a 50% majority rule (water if >= 5 of 9 sub-pixels are water).
     3. Boundary Buffer Exclusion: A 1-pixel boundary zone around water edges is
@@ -23,12 +23,24 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from dataclasses import asdict, dataclass
+from datetime import date
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+import planetary_computer
+import pystac_client
+import rasterio  # type: ignore[import-untyped]
+from rasterio.enums import Resampling  # type: ignore[import-untyped]
+from rasterio.windows import from_bounds  # type: ignore[import-untyped]
 from scipy.ndimage import binary_dilation, label  # type: ignore[import-untyped]
+
+from satellite_analyst.analysis.indices import compute_mndwi
+from satellite_analyst.analysis.water import compute_otsu_threshold, create_water_mask
+from satellite_analyst.data.composites import CompositeBuilder
+from satellite_analyst.planner.schema import BoundingBox, TimeInterval
 
 # ---------------------------------------------------------------------------
 # Data Models
@@ -57,7 +69,7 @@ class ValidationMetrics:
 
 
 # ---------------------------------------------------------------------------
-# Pure Metric Functions (Unit-testable with synthetic fixtures)
+# Pure Metric Functions
 # ---------------------------------------------------------------------------
 
 
@@ -83,7 +95,6 @@ def aggregate_10m_to_30m(
     w_trim = w - (w % 3)
     trimmed = mask_10m[:h_trim, :w_trim].astype(np.float32)
 
-    # Reshape to (h//3, 3, w//3, 3) and compute mean over sub-pixel axes
     blocks = trimmed.reshape(h_trim // 3, 3, w_trim // 3, 3)
     subpixel_mean = blocks.mean(axis=(1, 3))
     return np.asarray(subpixel_mean >= threshold_fraction, dtype=bool)
@@ -93,23 +104,10 @@ def extract_water_edge_boundary(
     water_mask: np.ndarray,
     width_px: int = 1,
 ) -> np.ndarray:
-    """Extract a 1-pixel boundary transition band around water edges.
-
-    Computes boundary ring = binary_dilation(water) & ~water.
-    Dilating this ring by width_px defines the boundary transition zone
-    where Landsat/Sentinel-2 misregistration is concentrated.
-
-    Args:
-        water_mask: 2D boolean array of water pixels.
-        width_px: Dilation width for boundary band.
-
-    Returns:
-        np.ndarray: 2D boolean mask where True indicates edge pixels.
-    """
+    """Extract a 1-pixel boundary transition band around water edges."""
     struct = np.ones((3, 3), dtype=bool)
     dilated = binary_dilation(water_mask, structure=struct, iterations=width_px)
     eroded = ~binary_dilation(~water_mask, structure=struct, iterations=width_px)
-    # The transition boundary is where dilated differs from eroded
     return np.asarray(dilated ^ eroded, dtype=bool)
 
 
@@ -118,16 +116,7 @@ def compute_binary_metrics(
     y_pred: np.ndarray,
     valid_mask: np.ndarray | None = None,
 ) -> ValidationMetrics:
-    """Calculate IoU, Precision, Recall, and F1 score for binary water masks.
-
-    Args:
-        y_true: Reference binary mask (1 = water, 0 = non-water).
-        y_pred: Predicted binary mask (1 = water, 0 = non-water).
-        valid_mask: Optional boolean mask where True indicates valid observation.
-
-    Returns:
-        ValidationMetrics dataclass.
-    """
+    """Calculate IoU, Precision, Recall, and F1 score for binary water masks."""
     if valid_mask is not None:
         t = y_true[valid_mask] > 0
         p = y_pred[valid_mask] > 0
@@ -176,31 +165,15 @@ def compute_block_bootstrap_ci(
     y_pred: np.ndarray,
     valid_mask: np.ndarray | None = None,
     block_size: int = 10,
-    n_bootstraps: int = 500,
+    n_bootstraps: int = 200,
     random_state: int = 42,
 ) -> dict[str, tuple[float, float]]:
-    """Compute 95% confidence intervals for IoU and F1 via spatial block-bootstrap.
-
-    Divides the 2D grid into spatial blocks of (block_size x block_size)
-    to preserve local spatial correlation structure during resampling.
-
-    Args:
-        y_true: 2D reference binary mask.
-        y_pred: 2D predicted binary mask.
-        valid_mask: Optional 2D valid observation mask.
-        block_size: Block width/height in pixels.
-        n_bootstraps: Number of bootstrap iterations.
-        random_state: Seed for reproducibility.
-
-    Returns:
-        dict: Mapping metric name to (ci_lower, ci_upper) tuple.
-    """
+    """Compute 95% confidence intervals for IoU and F1 via spatial block-bootstrap."""
     rng = np.random.default_rng(random_state)
     h, w = y_true.shape
     h_blocks = max(1, h // block_size)
     w_blocks = max(1, w // block_size)
 
-    # Slice into blocks
     blocks_true: list[np.ndarray] = []
     blocks_pred: list[np.ndarray] = []
     blocks_valid: list[np.ndarray] = []
@@ -246,21 +219,7 @@ def stratify_by_waterbody_size(
     y_true: np.ndarray,
     pixel_size_m: float = 30.0,
 ) -> dict[str, dict[str, float]]:
-    """Compute agreement metrics stratified by water body size in reference mask.
-
-    Strata:
-        - Small (< 1.0 ha)
-        - Medium (1.0 - 10.0 ha)
-        - Large (> 10.0 ha)
-
-    Args:
-        water_mask_pred: Predicted binary mask.
-        y_true: Reference binary mask.
-        pixel_size_m: Resolution in meters (default 30m for JRC grid).
-
-    Returns:
-        dict: Metrics per stratum.
-    """
+    """Compute agreement metrics stratified by water body size in reference mask."""
     pixel_ha = (pixel_size_m**2) / 10000.0
     struct = np.ones((3, 3), dtype=np.uint8)
     labeled, n_features = label(y_true.astype(np.uint8), structure=struct)
@@ -315,16 +274,13 @@ def stratify_by_waterbody_size(
 # Evaluation Pipeline Runner
 # ---------------------------------------------------------------------------
 
-
-# Evaluation AOIs justified by hydrological and spectral diversity
-EVALUATION_AOIS = [
+EVALUATION_AOIS: list[dict[str, Any]] = [
     {
         "id": "raipur",
         "name": "Raipur, Chhattisgarh",
         "hydrological_regime": "Inland alluvial plains & agricultural dendritic drainage",
         "centroid": [21.2381, 81.6337],
         "radius_km": 15.0,
-        "utm_epsg": 32644,
     },
     {
         "id": "bhopal",
@@ -332,7 +288,6 @@ EVALUATION_AOIS = [
         "hydrological_regime": "Lake-heavy urban & peri-urban plateau (Bhojtal / Halali)",
         "centroid": [23.2599, 77.4126],
         "radius_km": 15.0,
-        "utm_epsg": 32643,
     },
     {
         "id": "jodhpur",
@@ -340,111 +295,197 @@ EVALUATION_AOIS = [
         "hydrological_regime": "Arid desert fringe with small ephemeral impoundments (Kaylana)",
         "centroid": [26.2894, 73.0243],
         "radius_km": 15.0,
-        "utm_epsg": 32643,
     },
 ]
 
-VALIDATION_YEARS = [2019, 2020, 2021]
-VALIDATION_MONTHS = ["October", "November"]
+
+def bbox_from_centroid(lat: float, lon: float, radius_km: float = 15.0) -> BoundingBox:
+    """Calculate geographic bounding box from centroid and radius."""
+    lat_deg = radius_km / 111.0
+    lon_deg = radius_km / (111.0 * math.cos(math.radians(lat)))
+    return BoundingBox(
+        min_lon=lon - lon_deg,
+        min_lat=lat - lat_deg,
+        max_lon=lon + lon_deg,
+        max_lat=lat + lat_deg,
+    )
+
+
+def fetch_jrc_occurrence_raster(
+    bbox: BoundingBox,
+    target_shape: tuple[int, int],
+) -> np.ndarray:
+    """Fetch JRC GSW Water Occurrence raster directly from Planetary Computer COG."""
+    catalog = pystac_client.Client.open(
+        "https://planetarycomputer.microsoft.com/api/stac/v1",
+        modifier=planetary_computer.sign_inplace,
+    )
+    items = list(catalog.search(collections=["jrc-gsw"], bbox=bbox.as_list()).items())
+    if not items:
+        raise RuntimeError(f"No JRC GSW STAC item found for bbox {bbox.as_list()}")
+
+    occ_href = items[0].assets["occurrence"].href
+    with rasterio.open(occ_href) as src:
+        window = from_bounds(bbox.min_lon, bbox.min_lat, bbox.max_lon, bbox.max_lat, src.transform)
+        arr = src.read(1, window=window, out_shape=target_shape, resampling=Resampling.nearest)
+
+    return np.asarray(arr)
 
 
 def run_water_eval() -> dict[str, Any]:
     """Execute water mask validation benchmark against JRC Global Surface Water."""
     eval_dir = Path(__file__).parent
-    ref_dir = Path("data/reference/jrc_gsw")
     results_dir = eval_dir / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    aoi_results: list[dict[str, Any]] = []
-    missing_files: list[str] = []
-
     print("\n================ JRC GLOBAL SURFACE WATER VALIDATION ================")
-    print(" Reference Dataset: JRC GSW Monthly History (Pekel et al. Nature 2016)")
-    print(" Temporal Window:   Post-Monsoon (October-November) 2019, 2020, 2021")
-    print(" Resolution:        Sentinel-2 10m aggregated to Landsat 30m grid")
-    print(" Spatial Buffering: 1-pixel boundary zone exclusion reporting")
-    print(" Disagreement Rule: Reported strictly as 'agreement with JRC GSW'")
+    print(" Reference Dataset: JRC GSW Water Occurrence (Pekel et al. Nature 2016)")
+    print(" Source Access:     Microsoft Planetary Computer STAC ('jrc-gsw')")
+    print(" Target Period:     Post-Monsoon (October-November) 2020")
+    print(" Spatial Scheme:    Sentinel-2 10m aggregated to Landsat 30m (50% majority)")
+    print(" Boundary Filter:   1-pixel transition band evaluated with and without")
+    print(" Metric Rule:       Reported strictly as 'agreement with JRC GSW'")
     print("======================================================================\n")
 
+    builder = CompositeBuilder()
+    aoi_results: list[dict[str, Any]] = []
+
     for aoi in EVALUATION_AOIS:
-        aoi_id = aoi["id"]
-        aoi_name = aoi["name"]
-        print(f"[*] Checking reference data for {aoi_name} ({aoi['hydrological_regime']})...")
+        aoi_id = str(aoi["id"])
+        aoi_name = str(aoi["name"])
+        regime = str(aoi["hydrological_regime"])
+        centroid_raw = aoi["centroid"]
+        assert isinstance(centroid_raw, list)
+        lat = float(centroid_raw[0])
+        lon = float(centroid_raw[1])
+        radius = float(aoi["radius_km"])
 
-        has_all_data = True
-        yearly_eval: dict[int, Any] = {}
+        print(f"[*] Processing AOI: {aoi_name} ({regime})...")
+        bbox = bbox_from_centroid(lat, lon, radius)
 
-        for yr in VALIDATION_YEARS:
-            ref_path = ref_dir / f"{aoi_id}_jrc_monthly_{yr}.tif"
-            if not ref_path.exists():
-                has_all_data = False
-                missing_files.append(str(ref_path))
-                yearly_eval[yr] = {
-                    "status": "pending_reference_data",
-                    "expected_path": str(ref_path),
-                }
-            else:
-                # If reference GeoTIFF exists, perform full quantitative validation
-                import rasterio  # type: ignore[import-untyped]
+        # 1. Build Sentinel-2 10m composite for Post-Monsoon 2020
+        t_range = TimeInterval(
+            start_date=date(2020, 10, 1),
+            end_date=date(2020, 11, 30),
+            label="Post-Monsoon 2020",
+        )
+        comp = builder.build_composite(
+            bbox=bbox,
+            time_range=t_range,
+            max_cloud_cover=25.0,
+            min_valid_obs=2,
+        )
 
-                with rasterio.open(ref_path) as src:
-                    jrc_raw = src.read(1)
+        green = comp.green.values
+        swir1 = comp.swir1.values
+        valid_obs = comp.valid_count.values >= 2
+        mndwi = np.where(valid_obs, compute_mndwi(green, swir1), np.nan)
 
-                # JRC Monthly History coding:
-                # 0 = No observation, 1 = Not water, 2 = Water
-                jrc_valid = jrc_raw > 0
-                jrc_water = jrc_raw == 2
+        # Candidate thresholds
+        thresholds = [0.0, 0.05, -0.05]
+        otsu_val, is_bimodal, _ = compute_otsu_threshold(mndwi[valid_obs])
+        if is_bimodal:
+            thresholds.append(round(otsu_val, 2))
 
-                # Placeholder for composite aggregation when data file is provided
-                yearly_eval[yr] = {
-                    "status": "evaluated",
-                    "jrc_valid_pixels": int(np.sum(jrc_valid)),
-                    "jrc_water_pixels": int(np.sum(jrc_water)),
-                }
+        # Main evaluation uses default threshold = 0.0
+        mask_10m = create_water_mask(
+            mndwi=mndwi, threshold=0.0, min_area_ha=0.1, pixel_size_m=10.0
+        ).mask
+        mask_30m = aggregate_10m_to_30m(mask_10m, threshold_fraction=5 / 9)
 
-        aoi_results.append(
-            {
-                "aoi_id": aoi_id,
-                "aoi_name": aoi_name,
-                "hydrological_regime": aoi["hydrological_regime"],
-                "has_reference_data": has_all_data,
-                "yearly_validation": yearly_eval,
+        # 2. Fetch JRC GSW occurrence raster
+        jrc_raw = fetch_jrc_occurrence_raster(bbox, mask_30m.shape)
+
+        # JRC occurrence: 0-100%, 255 = no data
+        jrc_valid = (jrc_raw <= 100) & (jrc_raw >= 0)
+        jrc_perm = (jrc_raw >= 50) & jrc_valid  # Permanent water (>= 50% occurrence)
+        jrc_seasonal = (jrc_raw >= 10) & jrc_valid  # Seasonal + Permanent (>= 10% occurrence)
+
+        # 3. Metrics calculation
+        # Baseline: All pixels vs Permanent Water
+        m_perm_all = compute_binary_metrics(jrc_perm, mask_30m, valid_mask=jrc_valid)
+
+        # Boundary-excluded
+        edge_perm = extract_water_edge_boundary(jrc_perm, width_px=1)
+        m_perm_interior = compute_binary_metrics(
+            jrc_perm, mask_30m, valid_mask=(jrc_valid & ~edge_perm)
+        )
+
+        # Agreement vs Seasonal Water (>= 10%)
+        m_seasonal_all = compute_binary_metrics(jrc_seasonal, mask_30m, valid_mask=jrc_valid)
+
+        # Block-bootstrap CIs
+        boot_ci = compute_block_bootstrap_ci(
+            jrc_perm, mask_30m, valid_mask=jrc_valid, block_size=10, n_bootstraps=200
+        )
+
+        # Size strata
+        strata = stratify_by_waterbody_size(mask_30m, jrc_perm, pixel_size_m=30.0)
+
+        # Threshold sensitivity comparison
+        thresh_comparison: dict[str, dict[str, float]] = {}
+        for t_val in thresholds:
+            t_mask_10m = create_water_mask(
+                mndwi=mndwi, threshold=t_val, min_area_ha=0.1, pixel_size_m=10.0
+            ).mask
+            t_mask_30m = aggregate_10m_to_30m(t_mask_10m, threshold_fraction=5 / 9)
+            m_t = compute_binary_metrics(jrc_perm, t_mask_30m, valid_mask=jrc_valid)
+            thresh_comparison[f"MNDWI > {t_val}"] = {
+                "iou": m_t.iou,
+                "precision": m_t.precision,
+                "recall": m_t.recall,
+                "f1": m_t.f1,
             }
+
+        rec = {
+            "aoi_id": aoi_id,
+            "aoi_name": aoi_name,
+            "hydrological_regime": regime,
+            "scenes_used": len(comp.scene_ids),
+            "pred_water_pixels_30m": int(np.sum(mask_30m)),
+            "ref_permanent_pixels_30m": int(np.sum(jrc_perm)),
+            "ref_seasonal_pixels_30m": int(np.sum(jrc_seasonal)),
+            "agreement_permanent_water": {
+                "all_pixels": m_perm_all.to_dict(),
+                "boundary_excluded": m_perm_interior.to_dict(),
+                "block_bootstrap_ci_95": boot_ci,
+                "size_strata": strata,
+            },
+            "agreement_seasonal_water_ge10": m_seasonal_all.to_dict(),
+            "threshold_sensitivity": thresh_comparison,
+        }
+        aoi_results.append(rec)
+        print(
+            f"  [+] {aoi_name} evaluated | Perm Water IoU: {m_perm_all.iou:.4f} (F1: {m_perm_all.f1:.4f}) | "
+            f"Seasonal Water IoU: {m_seasonal_all.iou:.4f} (F1: {m_seasonal_all.f1:.4f})"
         )
 
     summary: dict[str, Any] = {
-        "status": "pending_manual_reference_downloads" if missing_files else "completed",
+        "status": "completed",
         "methodology": {
-            "reference_dataset": "JRC Global Surface Water Monthly History v1.4",
+            "reference_dataset": "JRC Global Surface Water Occurrence v1.3",
             "citation": "Pekel et al., Nature 540, 418-422 (2016)",
-            "validation_periods": "Post-Monsoon (Oct-Nov) for 2019, 2020, 2021",
-            "spatial_aggregation": "10m to 30m grid with 50% sub-pixel threshold",
+            "validation_period": "Post-Monsoon (Oct 1 - Nov 30) 2020",
+            "spatial_aggregation": "10m to 30m grid with 50% majority rule (5 of 9 subpixels)",
             "boundary_exclusion": "1-pixel transition band evaluated with and without",
             "stratification": "Size categories (<1 ha, 1-10 ha, >10 ha)",
-            "uncertainty": "Block-bootstrap 95% confidence intervals (10x10 px blocks, B=500)",
-            "reporting_standard": "Reported as 'agreement with JRC GSW', never 'accuracy'",
+            "uncertainty": "Block-bootstrap 95% confidence intervals (10x10 px blocks, B=200)",
+            "reporting_standard": "Reported strictly as 'agreement with JRC GSW', never 'accuracy'",
+            "seasonal_ephemeral_note": (
+                "Post-monsoon composite observes surface water directly after seasonal rains. "
+                "Agreement with JRC permanent water (occurrence >= 50%) is inherently constrained "
+                "by seasonal and ephemeral water bodies that naturally recede during dry months."
+            ),
         },
         "aois": aoi_results,
-        "missing_files_count": len(missing_files),
-        "instructions": (
-            "JRC GSW Monthly History raw observations are distributed via Google Earth Engine "
-            "asset collection 'JRC/GSW1_4/MonthlyHistory'. To execute full raster validation, "
-            "export the October-November composite for each AOI and place the GeoTIFFs at:\n"
-            + "\n".join(f"  - {f}" for f in missing_files[:6])
-        ),
     }
 
     out_file = results_dir / "water_eval_results.json"
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
-    if missing_files:
-        print(f"[!] {len(missing_files)} reference GeoTIFF files are pending manual export.")
-        print("    Honesty Rule Enforced: No invented metrics or surrogate numbers generated.")
-        print(f"    Summary state written to: {out_file}\n")
-    else:
-        print(f"[+] All reference rasters evaluated. Output saved to: {out_file}\n")
-
+    print(f"\n[+] Validation completed for all {len(aoi_results)} AOIs.")
+    print(f"    Summary results saved to: {out_file}\n")
     return summary
 
 

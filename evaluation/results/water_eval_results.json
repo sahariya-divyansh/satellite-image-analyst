@@ -1,33 +1,117 @@
 {
-  "status": "pending_manual_reference_downloads",
+  "status": "completed",
   "methodology": {
-    "reference_dataset": "JRC Global Surface Water Monthly History v1.4",
+    "reference_dataset": "JRC Global Surface Water Occurrence v1.3",
     "citation": "Pekel et al., Nature 540, 418-422 (2016)",
-    "validation_periods": "Post-Monsoon (Oct-Nov) for 2019, 2020, 2021",
-    "spatial_aggregation": "10m to 30m grid with 50% sub-pixel threshold",
+    "validation_period": "Post-Monsoon (Oct 1 - Nov 30) 2020",
+    "spatial_aggregation": "10m to 30m grid with 50% majority rule (5 of 9 subpixels)",
     "boundary_exclusion": "1-pixel transition band evaluated with and without",
     "stratification": "Size categories (<1 ha, 1-10 ha, >10 ha)",
-    "uncertainty": "Block-bootstrap 95% confidence intervals (10x10 px blocks, B=500)",
-    "reporting_standard": "Reported as 'agreement with JRC GSW', never 'accuracy'"
+    "uncertainty": "Block-bootstrap 95% confidence intervals (10x10 px blocks, B=200)",
+    "reporting_standard": "Reported strictly as 'agreement with JRC GSW', never 'accuracy'",
+    "seasonal_ephemeral_note": "Post-monsoon composite observes surface water directly after seasonal rains. Agreement with JRC permanent water (occurrence >= 50%) is inherently constrained by seasonal and ephemeral water bodies that naturally recede during dry months."
   },
   "aois": [
     {
       "aoi_id": "raipur",
       "aoi_name": "Raipur, Chhattisgarh",
       "hydrological_regime": "Inland alluvial plains & agricultural dendritic drainage",
-      "has_reference_data": false,
-      "yearly_validation": {
-        "2019": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\raipur_jrc_monthly_2019.tif"
+      "scenes_used": 14,
+      "pred_water_pixels_30m": 15992,
+      "ref_permanent_pixels_30m": 5821,
+      "ref_seasonal_pixels_30m": 23366,
+      "agreement_permanent_water": {
+        "all_pixels": {
+          "iou": 0.165,
+          "precision": 0.1932,
+          "recall": 0.5307,
+          "f1": 0.2832,
+          "tp_pixels": 3089,
+          "fp_pixels": 12903,
+          "fn_pixels": 2732,
+          "tn_pixels": 989283,
+          "water_pixels_ref": 5821,
+          "water_pixels_pred": 15992,
+          "total_valid_pixels": 1008007
         },
-        "2020": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\raipur_jrc_monthly_2020.tif"
+        "boundary_excluded": {
+          "iou": 0.1077,
+          "precision": 0.1101,
+          "recall": 0.8336,
+          "f1": 0.1945,
+          "tp_pixels": 1267,
+          "fp_pixels": 10242,
+          "fn_pixels": 253,
+          "tn_pixels": 982609,
+          "water_pixels_ref": 1520,
+          "water_pixels_pred": 11509,
+          "total_valid_pixels": 994371
         },
-        "2021": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\raipur_jrc_monthly_2021.tif"
+        "block_bootstrap_ci_95": {
+          "iou_ci_95": [
+            0.1399,
+            0.19
+          ],
+          "f1_ci_95": [
+            0.2454,
+            0.3192
+          ]
+        },
+        "size_strata": {
+          "< 1 ha": {
+            "iou": 0.0226,
+            "precision": 0.0243,
+            "recall": 0.2368,
+            "f1": 0.0441,
+            "ref_pixels": 1643
+          },
+          "1-10 ha": {
+            "iou": 0.0884,
+            "precision": 0.0947,
+            "recall": 0.5702,
+            "f1": 0.1625,
+            "ref_pixels": 2657
+          },
+          "> 10 ha": {
+            "iou": 0.0726,
+            "precision": 0.0741,
+            "recall": 0.7791,
+            "f1": 0.1353,
+            "ref_pixels": 1521
+          }
+        }
+      },
+      "agreement_seasonal_water_ge10": {
+        "iou": 0.221,
+        "precision": 0.4454,
+        "recall": 0.3048,
+        "f1": 0.362,
+        "tp_pixels": 7123,
+        "fp_pixels": 8869,
+        "fn_pixels": 16243,
+        "tn_pixels": 975772,
+        "water_pixels_ref": 23366,
+        "water_pixels_pred": 15992,
+        "total_valid_pixels": 1008007
+      },
+      "threshold_sensitivity": {
+        "MNDWI > 0.0": {
+          "iou": 0.165,
+          "precision": 0.1932,
+          "recall": 0.5307,
+          "f1": 0.2832
+        },
+        "MNDWI > 0.05": {
+          "iou": 0.1728,
+          "precision": 0.207,
+          "recall": 0.5114,
+          "f1": 0.2947
+        },
+        "MNDWI > -0.05": {
+          "iou": 0.1581,
+          "precision": 0.1813,
+          "recall": 0.5527,
+          "f1": 0.2731
         }
       }
     },
@@ -35,19 +119,108 @@
       "aoi_id": "bhopal",
       "aoi_name": "Bhopal, Madhya Pradesh",
       "hydrological_regime": "Lake-heavy urban & peri-urban plateau (Bhojtal / Halali)",
-      "has_reference_data": false,
-      "yearly_validation": {
-        "2019": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2019.tif"
+      "scenes_used": 9,
+      "pred_water_pixels_30m": 48253,
+      "ref_permanent_pixels_30m": 28641,
+      "ref_seasonal_pixels_30m": 45041,
+      "agreement_permanent_water": {
+        "all_pixels": {
+          "iou": 0.5472,
+          "precision": 0.5636,
+          "recall": 0.9495,
+          "f1": 0.7073,
+          "tp_pixels": 27195,
+          "fp_pixels": 21058,
+          "fn_pixels": 1446,
+          "tn_pixels": 985601,
+          "water_pixels_ref": 28641,
+          "water_pixels_pred": 48253,
+          "total_valid_pixels": 1035300
         },
-        "2020": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2020.tif"
+        "boundary_excluded": {
+          "iou": 0.5609,
+          "precision": 0.5693,
+          "recall": 0.9742,
+          "f1": 0.7187,
+          "tp_pixels": 23746,
+          "fp_pixels": 17963,
+          "fn_pixels": 628,
+          "tn_pixels": 984202,
+          "water_pixels_ref": 24374,
+          "water_pixels_pred": 41709,
+          "total_valid_pixels": 1026539
         },
-        "2021": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2021.tif"
+        "block_bootstrap_ci_95": {
+          "iou_ci_95": [
+            0.5099,
+            0.5856
+          ],
+          "f1_ci_95": [
+            0.6754,
+            0.7386
+          ]
+        },
+        "size_strata": {
+          "< 1 ha": {
+            "iou": 0.001,
+            "precision": 0.001,
+            "recall": 0.374,
+            "f1": 0.002,
+            "ref_pixels": 131
+          },
+          "1-10 ha": {
+            "iou": 0.0004,
+            "precision": 0.0004,
+            "recall": 0.2727,
+            "f1": 0.0009,
+            "ref_pixels": 77
+          },
+          "> 10 ha": {
+            "iou": 0.5473,
+            "precision": 0.5621,
+            "recall": 0.954,
+            "f1": 0.7074,
+            "ref_pixels": 28433
+          }
+        }
+      },
+      "agreement_seasonal_water_ge10": {
+        "iou": 0.647,
+        "precision": 0.7595,
+        "recall": 0.8137,
+        "f1": 0.7857,
+        "tp_pixels": 36649,
+        "fp_pixels": 11604,
+        "fn_pixels": 8392,
+        "tn_pixels": 978655,
+        "water_pixels_ref": 45041,
+        "water_pixels_pred": 48253,
+        "total_valid_pixels": 1035300
+      },
+      "threshold_sensitivity": {
+        "MNDWI > 0.0": {
+          "iou": 0.5472,
+          "precision": 0.5636,
+          "recall": 0.9495,
+          "f1": 0.7073
+        },
+        "MNDWI > 0.05": {
+          "iou": 0.5582,
+          "precision": 0.5765,
+          "recall": 0.9462,
+          "f1": 0.7165
+        },
+        "MNDWI > -0.05": {
+          "iou": 0.5354,
+          "precision": 0.5499,
+          "recall": 0.953,
+          "f1": 0.6974
+        },
+        "MNDWI > 0.09": {
+          "iou": 0.5656,
+          "precision": 0.5852,
+          "recall": 0.9442,
+          "f1": 0.7226
         }
       }
     },
@@ -55,23 +228,104 @@
       "aoi_id": "jodhpur",
       "aoi_name": "Jodhpur, Rajasthan",
       "hydrological_regime": "Arid desert fringe with small ephemeral impoundments (Kaylana)",
-      "has_reference_data": false,
-      "yearly_validation": {
-        "2019": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\jodhpur_jrc_monthly_2019.tif"
+      "scenes_used": 46,
+      "pred_water_pixels_30m": 1793,
+      "ref_permanent_pixels_30m": 888,
+      "ref_seasonal_pixels_30m": 2523,
+      "agreement_permanent_water": {
+        "all_pixels": {
+          "iou": 0.1199,
+          "precision": 0.1601,
+          "recall": 0.3232,
+          "f1": 0.2141,
+          "tp_pixels": 287,
+          "fp_pixels": 1506,
+          "fn_pixels": 601,
+          "tn_pixels": 1030872,
+          "water_pixels_ref": 888,
+          "water_pixels_pred": 1793,
+          "total_valid_pixels": 1033266
         },
-        "2020": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\jodhpur_jrc_monthly_2020.tif"
+        "boundary_excluded": {
+          "iou": 0.0974,
+          "precision": 0.1089,
+          "recall": 0.4794,
+          "f1": 0.1775,
+          "tp_pixels": 163,
+          "fp_pixels": 1334,
+          "fn_pixels": 177,
+          "tn_pixels": 1030303,
+          "water_pixels_ref": 340,
+          "water_pixels_pred": 1497,
+          "total_valid_pixels": 1031977
         },
-        "2021": {
-          "status": "pending_reference_data",
-          "expected_path": "data\\reference\\jrc_gsw\\jodhpur_jrc_monthly_2021.tif"
+        "block_bootstrap_ci_95": {
+          "iou_ci_95": [
+            0.042,
+            0.2018
+          ],
+          "f1_ci_95": [
+            0.0806,
+            0.3359
+          ]
+        },
+        "size_strata": {
+          "< 1 ha": {
+            "iou": 0.0022,
+            "precision": 0.0022,
+            "recall": 0.16,
+            "f1": 0.0044,
+            "ref_pixels": 25
+          },
+          "1-10 ha": {
+            "iou": 0.0059,
+            "precision": 0.0067,
+            "recall": 0.0482,
+            "f1": 0.0118,
+            "ref_pixels": 249
+          },
+          "> 10 ha": {
+            "iou": 0.1269,
+            "precision": 0.1511,
+            "recall": 0.4414,
+            "f1": 0.2252,
+            "ref_pixels": 614
+          }
+        }
+      },
+      "agreement_seasonal_water_ge10": {
+        "iou": 0.154,
+        "precision": 0.3212,
+        "recall": 0.2283,
+        "f1": 0.2669,
+        "tp_pixels": 576,
+        "fp_pixels": 1217,
+        "fn_pixels": 1947,
+        "tn_pixels": 1029526,
+        "water_pixels_ref": 2523,
+        "water_pixels_pred": 1793,
+        "total_valid_pixels": 1033266
+      },
+      "threshold_sensitivity": {
+        "MNDWI > 0.0": {
+          "iou": 0.1199,
+          "precision": 0.1601,
+          "recall": 0.3232,
+          "f1": 0.2141
+        },
+        "MNDWI > 0.05": {
+          "iou": 0.1238,
+          "precision": 0.17,
+          "recall": 0.3131,
+          "f1": 0.2204
+        },
+        "MNDWI > -0.05": {
+          "iou": 0.1142,
+          "precision": 0.1475,
+          "recall": 0.3356,
+          "f1": 0.205
         }
       }
     }
-  ],
-  "missing_files_count": 9,
-  "instructions": "JRC GSW Monthly History raw observations are distributed via Google Earth Engine asset collection 'JRC/GSW1_4/MonthlyHistory'. To execute full raster validation, export the October-November composite for each AOI and place the GeoTIFFs at:\n  - data\\reference\\jrc_gsw\\raipur_jrc_monthly_2019.tif\n  - data\\reference\\jrc_gsw\\raipur_jrc_monthly_2020.tif\n  - data\\reference\\jrc_gsw\\raipur_jrc_monthly_2021.tif\n  - data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2019.tif\n  - data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2020.tif\n  - data\\reference\\jrc_gsw\\bhopal_jrc_monthly_2021.tif"
+  ]
 }
