@@ -115,3 +115,38 @@ def test_segment_dual_period_shared_policy() -> None:
     assert mask_a.method == "shared_otsu"
     assert mask_b.method == "shared_otsu"
     assert mask_a.threshold == pytest.approx(mask_b.threshold, rel=1e-5)
+
+
+def test_segment_dual_period_unimodal_fallback() -> None:
+    # Unimodal data in both periods forces fallback to fixed_fallback_threshold
+    mndwi_a = np.full((20, 20), -0.3, dtype=np.float32)
+    mndwi_b = np.full((20, 20), -0.4, dtype=np.float32)
+
+    mask_a, mask_b = segment_dual_period_water(
+        mndwi_a, mndwi_b, policy="shared", fixed_fallback_threshold=0.0
+    )
+    assert mask_a.method == "shared_otsu_fallback"
+    assert mask_b.method == "shared_otsu_fallback"
+    assert mask_a.threshold == 0.0
+    assert mask_b.threshold == 0.0
+
+
+def test_segment_dual_period_per_period_policy() -> None:
+    mndwi_a = np.full((20, 20), 0.1, dtype=np.float32)
+    mndwi_b = np.full((20, 20), -0.2, dtype=np.float32)
+
+    mask_a, mask_b = segment_dual_period_water(
+        mndwi_a, mndwi_b, policy="per_period", override_threshold=0.0
+    )
+    assert mask_a.method == "manual_override"
+    assert mask_b.method == "manual_override"
+    assert mask_a.water_fraction == 1.0
+    assert mask_b.water_fraction == 0.0
+
+
+def test_create_water_mask_all_nan() -> None:
+    arr = np.full((10, 10), np.nan, dtype=np.float32)
+    wm = create_water_mask(arr, fixed_fallback_threshold=0.0)
+    assert wm.water_fraction == 0.0
+    assert np.all(~wm.valid_mask)
+    assert np.all(~wm.mask)

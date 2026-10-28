@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import cast
 
 import numpy as np
@@ -122,3 +123,23 @@ def test_detect_water_change_shape_mismatch() -> None:
 
     with pytest.raises(ValueError, match="Shape mismatch"):
         detect_water_change(mask_a, mask_b)
+
+
+def test_save_change_raster_to_geotiff(tmp_path: Path) -> None:
+    import rasterio
+    from affine import Affine
+
+    from satellite_analyst.analysis.change import save_change_raster_to_geotiff
+
+    raster = np.array([[0, 1], [2, 255]], dtype=np.uint8)
+    out_file = tmp_path / "change.tif"
+    transform = Affine.translation(100.0, 200.0) @ Affine.scale(10.0, -10.0)
+
+    res_path = save_change_raster_to_geotiff(raster, out_file, transform, "EPSG:32644")
+    assert res_path.exists()
+
+    with rasterio.open(res_path) as src:
+        assert src.count == 1
+        assert src.shape == (2, 2)
+        assert src.nodata == 255
+        assert src.read(1)[1, 0] == 2

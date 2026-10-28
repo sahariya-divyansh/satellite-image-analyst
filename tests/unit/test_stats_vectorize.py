@@ -214,3 +214,72 @@ def test_report_area_equals_analysed_valid_area() -> None:
     assert d["valid_aoi_km2"] == 3.95
     assert d["total_aoi_ha"] == 400.0
     assert d["valid_aoi_ha"] == 395.0
+
+
+def test_extract_waterbody_records_empty_mask() -> None:
+    shape = (20, 20)
+    mask_a = np.zeros(shape, dtype=bool)
+    mask_b = np.zeros(shape, dtype=bool)
+    transform = Affine.translation(0, 0) @ Affine.scale(10.0, -10.0)
+
+    records, gdf = extract_waterbody_records(mask_a, mask_b, transform=transform, crs="EPSG:32644")
+    assert len(records) == 0
+    assert len(gdf) == 0
+    assert "waterbody_id" in gdf.columns
+
+
+def test_extract_waterbody_records_filtered_by_min_area() -> None:
+    shape = (20, 20)
+    mask_a = np.zeros(shape, dtype=bool)
+    mask_b = np.zeros(shape, dtype=bool)
+    # 2 pixels is 0.02 ha, but min_area_ha is 0.10 ha (10 pixels)
+    mask_a[5:7, 5] = True
+    transform = Affine.translation(0, 0) @ Affine.scale(10.0, -10.0)
+
+    records, gdf = extract_waterbody_records(
+        mask_a, mask_b, transform=transform, crs="EPSG:32644", min_area_ha=0.10
+    )
+    assert len(records) == 0
+    assert len(gdf) == 0
+
+
+def test_summary_stats_zero_baseline_and_contraction() -> None:
+    # 1. Zero persistent baseline with gains -> inconclusive
+    raster_zero_pers = np.zeros((10, 10), dtype=np.uint8)
+    raster_zero_pers[0, 0] = WaterChangeClass.GAINED
+    stats_zero = compute_summary_stats(raster_zero_pers, waterbodies=[])
+    assert stats_zero.significance == "inconclusive (zero baseline persistent water)"
+
+    # 2. Significant contraction (large loss, small persistent, low churn)
+    raster_contract = np.zeros((100, 100), dtype=np.uint8)
+    raster_contract[:10, :100] = WaterChangeClass.PERSISTENT  # 1000 px
+    raster_contract[10:13, :50] = WaterChangeClass.LOST  # 150 px
+    stats_contract = compute_summary_stats(raster_contract, waterbodies=[])
+    assert stats_contract.significance == "significant contraction"
+
+
+def test_threshold_sensitivity_sign_flips_and_to_dict() -> None:
+    from satellite_analyst.analysis.stats import compute_threshold_sensitivity
+
+    mndwi_a = np.zeros((10, 10), dtype=np.float32)
+    mndwi_b = np.zeros((10, 10), dtype=np.float32)
+    valid_mask = np.ones((10, 10), dtype=bool)
+
+    # Low threshold: a gains more than b -> net is negative
+    # Mid: equal
+    # High threshold: b gains more than a -> net is positive
+    mndwi_a[:5, :] = -0.05
+    mndwi_b[5:, :] = 0.05
+
+    sens = compute_threshold_sensitivity(
+        mndwi_a=mndwi_a,
+        mndwi_b=mndwi_b,
+        valid_mask=valid_mask,
+        mid_threshold=0.0,
+        offset=0.1,
+    )
+    d = sens.to_dict()
+    assert isinstance(d, dict)
+    assert "sign_flips" in d
+    assert "is_stable" in d
+    assert "summary" in d

@@ -142,3 +142,62 @@ def test_save_composite_to_geotiff(tmp_path: Path) -> None:
         read_arr = src.read(1)
         assert pytest.approx(read_arr[0, 0]) == 0.1
         assert np.isnan(read_arr[1, 2])
+
+
+def test_compute_temporal_median_invalid_ndim() -> None:
+    stack_2d = np.ones((10, 10), dtype=np.float32)
+    with pytest.raises(ValueError, match="Expected 3D stack"):
+        compute_temporal_median(stack_2d)
+
+
+def test_parse_processing_baseline_edge_cases() -> None:
+    from satellite_analyst.data.composites import parse_processing_baseline
+
+    assert parse_processing_baseline("04.00") == 4.0
+    assert parse_processing_baseline("02.14") == 2.14
+    assert parse_processing_baseline("5") == 5.0
+    # Malformed / empty baseline returns default 4.0
+    assert parse_processing_baseline("invalid_string_without_digits") == 4.0
+
+
+def test_composite_builder_disk_caching(tmp_path: Path) -> None:
+    from satellite_analyst.data.composites import CompositeBuilder
+
+    xs = np.array([100.0, 110.0])
+    ys = np.array([200.0, 190.0])
+    green_arr = np.array([[0.1, 0.2], [0.3, 0.4]], dtype=np.float32)
+    swir1_arr = np.array([[0.05, 0.06], [0.07, 0.08]], dtype=np.float32)
+    valid_arr = np.array([[2, 2], [2, 2]], dtype=np.int16)
+
+    comp = CompositeResult(
+        green=xr.DataArray(green_arr, coords={"y": ys, "x": xs}, dims=["y", "x"]),
+        swir1=xr.DataArray(swir1_arr, coords={"y": ys, "x": xs}, dims=["y", "x"]),
+        valid_count=xr.DataArray(valid_arr, coords={"y": ys, "x": xs}, dims=["y", "x"]),
+        scene_ids=["S2A_TEST_01"],
+        date_range=("2023-10-01", "2023-11-30"),
+        per_scene_cloud=[{"id": "S2A_TEST_01", "cloud": 5.0}],
+        bbox=[81.5, 21.1, 81.8, 21.3],
+        crs="EPSG:32644",
+        valid_fraction=1.0,
+        software_version="0.1.1",
+    )
+
+    builder = CompositeBuilder()
+    cache_dir = tmp_path / "cache_test"
+    cache_params = {"bbox": comp.bbox, "min_valid_obs": 2}
+
+    # Save to cache
+    builder._save_cached_composite(comp, cache_dir, cache_params)
+    assert (cache_dir / "provenance.json").exists()
+    assert (cache_dir / "cached_green.tif").exists()
+
+    # Load from cache
+    loaded = builder._load_cached_composite(cache_dir)
+    assert loaded is not None
+    assert loaded.crs == "EPSG:32644"
+    assert loaded.scene_ids == ["S2A_TEST_01"]
+    assert pytest.approx(float(loaded.green.values[0, 0])) == 0.1
+
+    # Empty cache returns None
+    empty_dir = tmp_path / "non_existent"
+    assert builder._load_cached_composite(empty_dir) is None

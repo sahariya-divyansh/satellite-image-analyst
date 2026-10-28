@@ -146,26 +146,56 @@ def test_stac_per_item_baseline_detection(
     item_modern.id = "S2A_MSIL2A_20231015T050721_N0509_R019_T44QNJ_20231015T110000"
     item_modern.datetime = "2023-10-15T05:07:21Z"
     item_modern.properties = {"s2:processing_baseline": "05.09", "eo:cloud_cover": 1.0}
-    item_modern.assets = {"B03": MagicMock(href="https://example.com/b03.tif")}
+    # 4. Item without baseline or N-tag before Jan 2022 -> 02.14
+    item_inferred_legacy = MagicMock()
+    item_inferred_legacy.id = "S2A_MSIL2A_20210515_NO_TAG"
+    item_inferred_legacy.datetime = "2021-05-15T05:00:00Z"
+    item_inferred_legacy.properties = {"eo:cloud_cover": 3.0}
+    item_inferred_legacy.assets = {"B03": MagicMock(href="https://example.com/b03.tif")}
+
+    # 5. Item without baseline or N-tag after Jan 2022 -> 04.00
+    item_inferred_modern = MagicMock()
+    item_inferred_modern.id = "S2A_MSIL2A_20220615_NO_TAG"
+    item_inferred_modern.datetime = "2022-06-15T05:00:00Z"
+    item_inferred_modern.properties = {"eo:cloud_cover": 4.0}
+    item_inferred_modern.assets = {"B03": MagicMock(href="https://example.com/b03.tif")}
 
     mock_pystac_client = MagicMock()
     mock_search = MagicMock()
-    mock_search.items.return_value = [item_legacy, item_ntag, item_modern]
+    mock_search.items.return_value = [
+        item_legacy,
+        item_ntag,
+        item_modern,
+        item_inferred_legacy,
+        item_inferred_modern,
+    ]
     mock_pystac_client.search.return_value = mock_search
 
-    with patch("pystac_client.Client.open", return_value=mock_pystac_client):
+    with (
+        patch("pystac_client.Client.open", return_value=mock_pystac_client),
+        patch("planetary_computer.sign_inplace") as mock_sign,
+    ):
         collection = client._execute_search(
-            provider="earth_search",
+            provider="planetary_computer",
             bbox=dummy_bbox,
             time_range=dummy_interval,
             max_cloud_cover=40.0,
             limit=10,
         )
+        assert mock_sign.call_count == 5
 
-    assert len(collection.items) == 3
+    assert len(collection.items) == 5
+    # Sorted by datetime:
+    # 0: 2020-10-15 -> 02.14
+    # 1: 2021-03-20 -> 03.00
+    # 2: 2021-05-15 -> 02.14 (inferred from date < 2022-01-25)
+    # 3: 2022-06-15 -> 04.00 (inferred from date >= 2022-01-25)
+    # 4: 2023-10-15 -> 05.09
     assert collection.items[0].processing_baseline == "02.14"
     assert collection.items[1].processing_baseline == "03.00"
-    assert collection.items[2].processing_baseline == "05.09"
+    assert collection.items[2].processing_baseline == "02.14"
+    assert collection.items[3].processing_baseline == "04.00"
+    assert collection.items[4].processing_baseline == "05.09"
 
 
 @pytest.mark.network
