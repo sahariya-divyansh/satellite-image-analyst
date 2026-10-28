@@ -6,5 +6,5 @@ reproducible remote sensing pipelines with grounded statistical verification.
 
 from typing import Final
 
-__version__: Final[str] = "0.1.0"
+__version__: Final[str] = "0.1.1"
 __all__: Final[list[str]] = ["__version__"]

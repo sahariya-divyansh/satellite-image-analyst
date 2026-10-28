@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "satellite-analyst"
-version = "0.1.0"
+version = "0.1.1"
 description = "Natural-Language Satellite Image Analyst: query-driven Earth observation pipelines with grounded verification"
 readme = "README.md"
 requires-python = ">=3.11"

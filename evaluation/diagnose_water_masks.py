@@ -130,9 +130,7 @@ def load_multi_band_composite(
         datetime=f"{year}-10-01/{year}-11-30",
         query={"eo:cloud_cover": {"lt": max_cloud_cover}},
     )
-    items = sorted(
-        search.items(), key=lambda x: x.datetime.isoformat() if x.datetime else ""
-    )
+    items = sorted(search.items(), key=lambda x: x.datetime.isoformat() if x.datetime else "")
     if not items:
         raise RuntimeError(f"No scenes found for {year}")
 
@@ -269,9 +267,7 @@ def run_diagnostics() -> dict[str, Any]:
     for aoi_id, yr in diag_runs:
         aoi = next(a for a in aois if a["id"] == aoi_id)
         print(f"[*] Running land-cover & JRC diagnostic for {aoi['name']} ({yr})...")
-        bbox = bbox_from_centroid(
-            float(aoi["lat"]), float(aoi["lon"]), float(aoi["radius"])
-        )
+        bbox = bbox_from_centroid(float(aoi["lat"]), float(aoi["lon"]), float(aoi["radius"]))
 
         bands = load_multi_band_composite(bbox, yr, max_cloud_cover=30.0)
         variants = compute_mask_variants(bands)
@@ -342,9 +338,7 @@ def run_diagnostics() -> dict[str, Any]:
     for aoi in aois:
         aoi_id = str(aoi["id"])
         print(f"[*] Evaluating variants for {aoi['name']} (2020)...")
-        bbox = bbox_from_centroid(
-            float(aoi["lat"]), float(aoi["lon"]), float(aoi["radius"])
-        )
+        bbox = bbox_from_centroid(float(aoi["lat"]), float(aoi["lon"]), float(aoi["radius"]))
         bands = load_multi_band_composite(bbox, 2020, max_cloud_cover=25.0)
         variants = compute_mask_variants(bands)
 
